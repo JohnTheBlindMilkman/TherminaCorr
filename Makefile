@@ -11,11 +11,10 @@ vpath %.cxx $(DIR_CXX)
 vpath %.o   $(DIR_OBJ)
 
 # file lists
-# THERM2_EVENTS
-BIN_EVENTS  = test
-HSRC_EVENTS = sayHello.cxx
-SRC_EVENTS  = $(HSRC_EVENTS:%=$(DIR_CXX)%) $(BIN_EVENTS:%=$(DIR_CXX)%.cxx)
-OBJ_EVENTS  = $(SRC_EVENTS:$(DIR_CXX)%.cxx=$(DIR_OBJ)%.o)
+BIN_FEMTO  = thermiCorr
+HSRC_FEMTO = Configurator.cxx Parser.cxx
+SRC_FEMTO  = $(HSRC_FEMTO:%=$(DIR_CXX)%) $(BIN_FEMTO:%=$(DIR_CXX)%.cxx)
+OBJ_FEMTO  = $(SRC_FEMTO:$(DIR_CXX)%.cxx=$(DIR_OBJ)%.o)
 
 # preprocessor
 PREPROCESS  = -D_CXX_VER_="\"$(shell $(CXX) --version | grep $(CXX))\"" -D_ROOT_VER_="\"$(shell root-config --version)\""
@@ -30,13 +29,13 @@ LFLAGS      = -lm -g `root-config --libs`
 # RULES                                                                         #
 #################################################################################
  
-all: $(BIN_EVENTS:%=$(DIR_OBJ)%) $(BIN_FEMTO:%=$(DIR_OBJ)%) $(BIN_HBTFIT:%=$(DIR_OBJ)%)
+all: $(BIN_FEMTO:%=$(DIR_OBJ)%) 
 	cp $^ $(DIR_MAIN)
 	echo
 	echo "Ready!"
 	echo
 
-$(DIR_OBJ)test: $(OBJ_EVENTS)
+$(DIR_OBJ)thermiCorr: $(OBJ_FEMTO)
 	echo "Linking:   $@ ($(LD))"
 	$(LD) $^ -o $@ $(LFLAGS)
 
@@ -47,5 +46,5 @@ $(DIR_OBJ)%.o: %.cxx
 
 clean:
 	rm -f $(DIR_OBJ)*.o
-	rm -f $(DIR_OBJ)$(BIN_EVENTS) $(DIR_MAIN)$(BIN_EVENTS)
+	rm -f $(DIR_OBJ)$(BIN_FEMTO) $(DIR_MAIN)$(BIN_FEMTO)
 	echo "*.o and binary files removed."
