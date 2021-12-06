@@ -12,7 +12,7 @@ vpath %.o   $(DIR_OBJ)
 
 # file lists
 BIN_FEMTO  = thermiCorr
-HSRC_FEMTO = Configurator.cxx Parser.cxx
+HSRC_FEMTO = Configurator.cxx Parser.cxx Messages.cxx HBTFit.cxx Accessibility.cxx
 SRC_FEMTO  = $(HSRC_FEMTO:%=$(DIR_CXX)%) $(BIN_FEMTO:%=$(DIR_CXX)%.cxx)
 OBJ_FEMTO  = $(SRC_FEMTO:$(DIR_CXX)%.cxx=$(DIR_OBJ)%.o)
 

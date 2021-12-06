@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <cstdio>
+#include <TString.h>
 
 // Global static constants
 
@@ -12,10 +13,13 @@ static const double kTwoPi2 =  39.4784176043574344753379639995;
 static const double kHbarC  =   0.1973269631;
 
 static const int kFileNameMaxChar = 2000;
+static const int NoParams = 7;
+
+static const TString sParNames[NoParams] = {"LambdaInv","Rinv","Norm","LambdaOSL","Rout","Rside","Rlong"};
 
 // Define version of THERMINATOR 2
 
-#define _THERMINATOR2_VERSION_  "2.0.3"
+#define _THERMINACORR_VERSION_  "0.5.0"
 
 // Define compilation specific variables
 
@@ -36,6 +40,8 @@ static const int kFileNameMaxChar = 2000;
 #define _ERROR_LIBRARY_TAG_ATTRIB_NOT_FOUND_	6
 #define _ERROR_LIBRARY_VECTOR3D_NOT_FOUND_	7
 #define _ERROR_FEMTO_UNKNOWN_PAIRTYPE_		16
+#define _ERROR_FEMTO_WRONG_KT_ORDER_		17
+#define _ERROR_FEMTO_GRAPH_NOT_FOUND_		18
 
 // Define DEBUG information
 
