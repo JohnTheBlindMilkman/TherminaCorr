@@ -28,6 +28,7 @@ Messages *msg;
 HBTFit *hbtFit;
 TString sMainINI,sPairType,sEventDir,sTimeStamp;
 int minkT,maxkT,firstkT,stepkT;
+double lowCut,highCut,lambda;
 
 TH3D *ratq;
 TH1D *ratq1;
@@ -78,7 +79,7 @@ int main(int argc, char **argv)
                 if(sPairType == "pion-pion")
                     partName = "pipi";
                 else    
-                    partName = "pimpim";
+                    partName = "piMpiM";
 
                 sMainINI = argv[3];
                 if(sMainINI.IsDigit()) 
@@ -185,6 +186,14 @@ int main(int argc, char **argv)
     catch (TString tError) 
     {
     }
+    try 
+    {
+        lowCut = sMainConfig->GetParameter("LambdaCutLow").Atof();
+        highCut = sMainConfig->GetParameter("LambdaCutHigh").Atof();
+    }
+    catch (TString tError) 
+    {
+    }
     
     accss->CopyINIFile(sMainINI,sEventDir);
 
@@ -228,6 +237,9 @@ int main(int argc, char **argv)
     TH3D *numq,*denq;
     TH1D *numq1,*denq1;
     TGraphErrors *gFitRes[NoParams];
+    vector<double> parVals[NoParams];
+    vector<double> parErrs[NoParams];
+    vector<double> kTVal[NoParams];
     int iter2;
 
     funqg = new TF3("funqg",hbtFit, &HBTFit::fungek, -0.15, 0.15, -0.15, 0.15, -0.15, 0.15, 5);
@@ -281,11 +293,11 @@ int main(int argc, char **argv)
         funqk1->SetParName(iter, sParNames[iter]);
     }
     
-    for (int iter = 0; iter < NoParams; iter++)
-        gFitRes[iter] = new TGraphErrors(kTlen);
+    
 
     for(int ii = minkT; ii <= maxkT; ii++)
     {
+        lambda = 0;
         PRINT_MESSAGE("["<<sTimeStamp<<"]\tFitting.");
 
         tInRootName = TString::Format("%sfemto%s%ia.root",sEventDir.Data(),partName.Data(),ii);
@@ -321,7 +333,7 @@ int main(int argc, char **argv)
         tOutTextFile = new ofstream(tOutTextName);
         (*tOutTextFile) << "["<<sTimeStamp<<"]\t" << tInRootName << endl;
 
-        kTmiddle = firstkT+(ii-minkT)*stepkT;
+        
 
         PRINT_DEBUG_1("Fit results:");
         for (int iter = 0; iter < NoParams; iter++)
@@ -330,16 +342,24 @@ int main(int argc, char **argv)
             {
                 parVal = fabs(funqk1->GetParameter(iter));
                 parErr = fabs(funqk1->GetParError(iter));
+                if(iter == 0)
+                    lambda = parVal;
             }
             else
             {
                 parVal = fabs(funqk->GetParameter(iter-2));
                 parErr = fabs(funqk->GetParError(iter-2));
+                if(iter == 3)
+                    lambda = parVal;
             }
             
             (*tOutTextFile) << sParNames[iter] << "\t" << parVal << " +/- " << parErr << endl;
-            gFitRes[iter]->SetPoint(ii,kTmiddle,parVal);
-            gFitRes[iter]->SetPointError(ii,0,parErr);
+            if(lambda > lowCut && lambda < highCut)
+            {
+                kTVal[iter].push_back(firstkT+(ii-minkT)*stepkT);
+                parVals[iter].push_back(parVal);
+                parErrs[iter].push_back(parErr);
+            }
             PRINT_DEBUG_1("\t" + sParNames[iter] << parVal << " +/- " << parErr);
         }
         tOutTextFile->close();
@@ -606,9 +626,12 @@ int main(int argc, char **argv)
     }
 
     TFile *paramFile = new TFile();
-    paramFile = TFile::Open(Form("%s%s",sEventDir.Data(),"parameterFit.root"),"RECREATE");
+    paramFile = TFile::Open(Form("%sparameterFit%s.root",sEventDir.Data(),partName.Data()),"RECREATE");
     for (int iter = 0; iter < NoParams; iter++) 
+    {
+        gFitRes[iter] = new TGraphErrors(kTVal[iter].size(),&kTVal[iter][0],&parVals[iter][0],0,&parErrs[iter][0]);
         gFitRes[iter]->Write(Form("g%s_%i_%i",sParNames[iter].Data(),minkT,maxkT));
+    }
     
     paramFile->Close();
 
