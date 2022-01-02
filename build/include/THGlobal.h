@@ -19,7 +19,7 @@ static const TString sParNames[NoParams] = {"LambdaInv","Rinv","Norm","LambdaOSL
 
 // Define version of THERMINATOR 2
 
-#define _THERMINACORR_VERSION_  "0.5.0"
+#define _THERMINACORR_VERSION_  "1.1.1"
 
 // Define compilation specific variables
 
@@ -34,11 +34,12 @@ static const TString sParNames[NoParams] = {"LambdaInv","Rinv","Norm","LambdaOSL
 
 #define _ERROR_GENERAL_FILE_NOT_FOUND_		1
 #define _ERROR_GENERAL_MODEL_UNKNOWN_		2
-#define _ERROR_CONFIG_PARAMETER_NOT_FOUND_	3
-#define _ERROR_LIBRARY_EMPTY_			4
-#define _ERROR_LIBRARY_TAG_NOT_FOUND_		5
-#define _ERROR_LIBRARY_TAG_ATTRIB_NOT_FOUND_	6
-#define _ERROR_LIBRARY_VECTOR3D_NOT_FOUND_	7
+#define _ERROR_GENERAL_UNSUPORTED_VALUE_ 3
+#define _ERROR_CONFIG_PARAMETER_NOT_FOUND_	4
+#define _ERROR_LIBRARY_EMPTY_			5
+#define _ERROR_LIBRARY_TAG_NOT_FOUND_		6
+#define _ERROR_LIBRARY_TAG_ATTRIB_NOT_FOUND_	7
+#define _ERROR_LIBRARY_VECTOR3D_NOT_FOUND_	8
 #define _ERROR_FEMTO_UNKNOWN_PAIRTYPE_		16
 #define _ERROR_FEMTO_WRONG_KT_ORDER_		17
 #define _ERROR_FEMTO_GRAPH_NOT_FOUND_		18

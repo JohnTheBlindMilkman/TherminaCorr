@@ -1,6 +1,7 @@
 #include <TPad.h>
 
 #include "HBTFit.h"
+#include "THGlobal.h"
 
 HBTFit::HBTFit()
 {
@@ -62,98 +63,58 @@ TH1D* HBTFit::getproj(TH3D *numq, TH3D *denq, int nproj, int wbin, double norm)
 {
     Double_t intnexp = norm;
     Double_t intdexp = 1.0;
-    TH1D *hpxc,*hpyc,*hpzc;
+    TString sProj = nullptr;
+    TH1D *hproj,*denbuf,*numbuf;
 
     Int_t binc = numq->GetXaxis()->FindFixBin(0.0);
     Int_t binm = binc + wbin;
 
-    TH1D *denbuf,*numbuf;
+    numq->GetXaxis()->SetRange(binc, binm);
+    numq->GetYaxis()->SetRange(binc, binm);
+    numq->GetZaxis()->SetRange(binc, binm);
+    denq->GetXaxis()->SetRange(binc, binm);
+    denq->GetYaxis()->SetRange(binc, binm);
+    denq->GetZaxis()->SetRange(binc, binm);
 
-    for (int ia=nproj; ia<=nproj; ia++) 
+    switch (nproj) 
     {
-
-        numq->GetXaxis()->SetRange(binc, binm);
-        numq->GetYaxis()->SetRange(binc, binm);
-        numq->GetZaxis()->SetRange(binc, binm);
-        denq->GetXaxis()->SetRange(binc, binm);
-        denq->GetYaxis()->SetRange(binc, binm);
-        denq->GetZaxis()->SetRange(binc, binm);
-        switch (ia) 
-        {
-            case 0:
-                denq->GetXaxis()->SetRange(1,numq->GetNbinsX());
-                numq->GetXaxis()->SetRange(1,numq->GetNbinsX());
-                denbuf = new TH1D(*((TH1D *) denq->Project3D("x")));
-                numbuf = new TH1D(*((TH1D *) numq->Project3D("x")));
-                hpxc = new TH1D(*numbuf);
-                hpxc->Sumw2();
-                hpxc->Reset("ICE");
-                hpxc->Divide(numbuf, denbuf, 1.0, 1.0, "");
-                for (int iter=1; iter<hpxc->GetNbinsX(); iter++)
-                    if (numbuf->GetBinContent(iter)) 
-                    {
-                        Double_t dn = numbuf->GetBinError(iter);
-                        Double_t an = numbuf->GetBinContent(iter);
-                        Double_t dd = denbuf->GetBinError(iter);
-                        Double_t ad = denbuf->GetBinContent(iter);
-                        hpxc->SetBinError(iter, TMath::Sqrt((dn*dn*ad*ad + dd*dd*an*an + dd*dd*dn*dn)/(ad*ad*ad*ad)));
-                    }
-                else 
-                    hpxc->SetBinContent(iter,0);
-                hpxc->Scale(intdexp/intnexp);
-                break;
-            case 1:
-                denq->GetYaxis()->SetRange(1,numq->GetNbinsY());
-                numq->GetYaxis()->SetRange(1,numq->GetNbinsY());
-                denbuf = new TH1D(*((TH1D *) denq->Project3D("y")));
-                numbuf = new TH1D(*((TH1D *) numq->Project3D("y")));
-                hpyc = new TH1D(*numbuf);
-                hpyc->Sumw2();
-                hpyc->Reset("ICE");
-                hpyc->Divide(numbuf, denbuf, 1.0, 1.0, "");
-                for (int iter=1; iter<hpyc->GetNbinsX(); iter++)
-                    if (numbuf->GetBinContent(iter)) 
-                    {
-                        Double_t dn = numbuf->GetBinError(iter);
-                        Double_t an = numbuf->GetBinContent(iter);
-                        Double_t dd = denbuf->GetBinError(iter);
-                        Double_t ad = denbuf->GetBinContent(iter);
-                        hpyc->SetBinError(iter, TMath::Sqrt((dn*dn*ad*ad + dd*dd*an*an + dd*dd*dn*dn)/(ad*ad*ad*ad)));
-                    }
-                else 
-                    hpyc->SetBinContent(iter,0);
-                hpyc->Scale(intdexp/intnexp);
-                break;
-            case 2:
-                denq->GetZaxis()->SetRange(1,numq->GetNbinsZ());
-                numq->GetZaxis()->SetRange(1,numq->GetNbinsZ());
-                denbuf = new TH1D(*((TH1D *) denq->Project3D("z")));
-                numbuf = new TH1D(*((TH1D *) numq->Project3D("z")));
-                hpzc = new TH1D(*numbuf);
-                hpzc->Sumw2();
-                hpzc->Reset("ICE");
-                hpzc->Divide(numbuf, denbuf, 1.0, 1.0, "");
-                for (int iter=1; iter<hpzc->GetNbinsX(); iter++)
-                    if (numbuf->GetBinContent(iter)) 
-                    {
-                        Double_t dn = numbuf->GetBinError(iter);
-                        Double_t an = numbuf->GetBinContent(iter);
-                        Double_t dd = denbuf->GetBinError(iter);
-                        Double_t ad = denbuf->GetBinContent(iter);
-                        hpzc->SetBinError(iter, TMath::Sqrt((dn*dn*ad*ad + dd*dd*an*an + dd*dd*dn*dn)/(ad*ad*ad*ad)));
-                    }
-                else 
-                    hpzc->SetBinContent(iter,0);
-                hpzc->Scale(intdexp/intnexp);
-                break;
-        }
+        case 0:
+            sProj = "x";
+            break;
+        case 1:
+            sProj = "y";
+            break;
+        case 2:
+            sProj = "z";
+            break;
+        default:
+            PRINT_MESSAGE("Error: Unknown projection type");
+            exit(_ERROR_GENERAL_UNSUPORTED_VALUE_);
     }
-    if (nproj == 0)
-        return hpxc;
-    else if (nproj == 1)
-        return hpyc;
-    else
-        return hpzc;
+    
+    denq->GetXaxis()->SetRange(1,numq->GetNbinsX());
+    numq->GetXaxis()->SetRange(1,numq->GetNbinsX());
+    denbuf = new TH1D(*((TH1D *) denq->Project3D(sProj)));
+    numbuf = new TH1D(*((TH1D *) numq->Project3D(sProj)));
+
+    hproj = new TH1D(*numbuf);
+    hproj->Sumw2();
+    hproj->Reset("ICE");
+    hproj->Divide(numbuf, denbuf, 1.0, 1.0, "");
+
+    for (int iter=1; iter<hproj->GetNbinsX(); iter++)
+        if (numbuf->GetBinContent(iter)) 
+        {
+            Double_t dn = numbuf->GetBinError(iter);
+            Double_t an = numbuf->GetBinContent(iter);
+            Double_t dd = denbuf->GetBinError(iter);
+            Double_t ad = denbuf->GetBinContent(iter);
+            hproj->SetBinError(iter, TMath::Sqrt((dn*dn*ad*ad + dd*dd*an*an + dd*dd*dn*dn)/(ad*ad*ad*ad)));
+        }
+
+    hproj->Scale(intdexp/intnexp);
+
+    return hproj;
 }
 
 Double_t HBTFit::fungek(Double_t *x, Double_t *par)
