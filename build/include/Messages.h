@@ -9,6 +9,7 @@ class Messages
         
         void MessageIntro();
         void MessageHelp();
+        void MessageHelpQ2();
         void MessageVersion();
 };
 

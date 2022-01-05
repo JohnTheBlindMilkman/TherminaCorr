@@ -16,6 +16,11 @@ HSRC_FEMTO = Configurator.cxx Parser.cxx Messages.cxx HBTFit.cxx Accessibility.c
 SRC_FEMTO  = $(HSRC_FEMTO:%=$(DIR_CXX)%) $(BIN_FEMTO:%=$(DIR_CXX)%.cxx)
 OBJ_FEMTO  = $(SRC_FEMTO:$(DIR_CXX)%.cxx=$(DIR_OBJ)%.o)
 
+BIN_Q2  = Q2test
+HSRC_Q2 = Configurator.cxx Parser.cxx Messages.cxx Accessibility.cxx Compliance.cxx
+SRC_Q2  = $(HSRC_Q2:%=$(DIR_CXX)%) $(BIN_Q2:%=$(DIR_CXX)%.cxx)
+OBJ_Q2  = $(SRC_Q2:$(DIR_CXX)%.cxx=$(DIR_OBJ)%.o)
+
 # preprocessor
 PREPROCESS  = -D_CXX_VER_="\"$(shell $(CXX) --version | grep $(CXX))\"" -D_ROOT_VER_="\"$(shell root-config --version)\""
 
@@ -29,13 +34,19 @@ LFLAGS      = -lm -g `root-config --libs`
 # RULES                                                                         #
 #################################################################################
  
-all: $(BIN_FEMTO:%=$(DIR_OBJ)%) 
+all: $(BIN_FEMTO:%=$(DIR_OBJ)%) $(BIN_Q2:%=$(DIR_OBJ)%)
 	cp $^ $(DIR_MAIN)
 	echo
 	echo "Ready!"
+	echo "Type \"./thermiCorr\" to generate two-particle corelation function,"
+	echo "Type \"./Q2test\" to fit and extract HBT radii."
 	echo
 
 $(DIR_OBJ)thermiCorr: $(OBJ_FEMTO)
+	echo "Linking:   $@ ($(LD))"
+	$(LD) $^ -o $@ $(LFLAGS)
+
+$(DIR_OBJ)Q2test: $(OBJ_Q2)
 	echo "Linking:   $@ ($(LD))"
 	$(LD) $^ -o $@ $(LFLAGS)
 
@@ -47,4 +58,5 @@ $(DIR_OBJ)%.o: %.cxx
 clean:
 	rm -f $(DIR_OBJ)*.o
 	rm -f $(DIR_OBJ)$(BIN_FEMTO) $(DIR_MAIN)$(BIN_FEMTO)
+	rm -f $(DIR_OBJ)$(BIN_Q2) $(DIR_MAIN)$(BIN_Q2)
 	echo "*.o and binary files removed."

@@ -45,6 +45,18 @@ void Messages::MessageHelp()
     PRINT_MESSAGE("    -v | --version\tversion information");
 }
 
+void Messages::MessageHelpQ2()
+{
+    PRINT_MESSAGE("Usage: ");
+    PRINT_MESSAGE("Q2test <FILE_PATH> [Q2TEST_INI]");
+    PRINT_MESSAGE("Q2test [OPTION]");
+    PRINT_MESSAGE("  <FILE_PATH>\t\tpath to therminacorr output file containing fit parameters");
+    PRINT_MESSAGE("  [Q2TEST_INI]\t\tmain settings file;\t\tdefault: Q2test.ini");
+    PRINT_MESSAGE("  [OPTION]");
+    PRINT_MESSAGE("    -h | --help\t\tthis screen");
+    PRINT_MESSAGE("    -v | --version\tversion information");
+}
+
 void Messages::MessageVersion()
 {
     PRINT_MESSAGE("version:\tTherminacorr version "<<_THERMINACORR_VERSION_);
