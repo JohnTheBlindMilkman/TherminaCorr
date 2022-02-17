@@ -1,30 +1,40 @@
+#include <TMath.h>
+#include "Accessibility.h"
 #include "Compliance.h"
 #include "THGlobal.h"
 
 using namespace std;
 
-Compliance::Compliance():mExpNames(0),mMinBin(0),mMaxBin(0)
+Compliance::Compliance():mModName("")
 {
 }
 
-Compliance::Compliance(TString sModFilePath, TString sModName, TString sExpFilePath, TString sExpName)
+Compliance::Compliance(TString sModFilePath, TString sModName, TString sExpFilePath, TString sExpName):mModName(sModName)
 {
-    mEFile = TFile::Open(sModFilePath);
+    mEFile = TFile::Open(sExpFilePath);
     if(!mEFile->IsOpen() || mEFile->IsZombie()) 
-    {
-        PRINT_MESSAGE("<Compliance::Compliance>\tFile "<<sModFilePath<<" not found.");
-        exit(_ERROR_GENERAL_FILE_NOT_FOUND_);
-    }
-
-    mMFile = TFile::Open(sExpFilePath);
-    if(!mMFile->IsOpen() || mMFile->IsZombie()) 
     {
         PRINT_MESSAGE("<Compliance::Compliance>\tFile "<<sExpFilePath<<" not found.");
         exit(_ERROR_GENERAL_FILE_NOT_FOUND_);
     }
 
+    mMFile = TFile::Open(sModFilePath);
+    if(!mMFile->IsOpen() || mMFile->IsZombie()) 
+    {
+        PRINT_MESSAGE("<Compliance::Compliance>\tFile "<<sModFilePath<<" not found.");
+        exit(_ERROR_GENERAL_FILE_NOT_FOUND_);
+    }
+
     mMod = (TGraph*) mMFile->Get(sModName);
     mExp = (TGraph*) mEFile->Get(sExpName);
+
+    if(mMod == nullptr || mExp == nullptr)
+    {
+        PRINT_MESSAGE("<Compliance::Compliance>\tGraphs are null");
+        exit(_ERROR_GENERAL_UNSUPORTED_VALUE_);
+    }
+
+    mEventDir = Accessibility::getEventDir(sModFilePath);
 }
 
 Compliance::~Compliance()
@@ -36,15 +46,21 @@ Compliance::~Compliance()
         mMFile->Close();
 }
 
-void Compliance::printResult(bool moreInfo)
+double Compliance::printResult(bool moreInfo)
 {
-    double totDif;
-    PRINT_MESSAGE("============== Q2 Test Result ==============");
-    PRINT_MESSAGE(Form("Parameter:\t%s",mExp->GetName()));
-    PRINT_MESSAGE(Form("Q2:\t%f",Q2Test(totDif)));
+    double totDif,Q2 = 0;
+    int ndf;
+
+    Q2 = Q2Test(ndf,totDif);
+
+    PRINT_MESSAGE("================== Q2 Test Result ==================");
+    PRINT_MESSAGE(Form("Parameter:\t%s",mModName.Data()));
+    PRINT_MESSAGE(Form("Q2:\t%f",Q2));
     if(moreInfo)
-        PRINT_MESSAGE(Form("Total difference on x axis:\t%f",totDif));
-    PRINT_MESSAGE("============================================");
+        PRINT_MESSAGE(Form("Total difference on x axis per NDF:\t%.2f/%d",totDif,ndf));
+    PRINT_MESSAGE("====================================================");
+
+    return Q2;
 }
 
 bool Compliance::getModelName(TString expName, int iter, int minkT, int maxkT, TString &modName)
@@ -61,15 +77,15 @@ bool Compliance::getModelName(TString expName, int iter, int minkT, int maxkT, T
     return true;
 }
 
-double Compliance::Q2Test(double &totDiff)
+double Compliance::Q2Test(int &ndf,double &totDiff)
 {
-    const int elem = mMod->GetN();
+    ndf = mMod->GetN();
     int iter;
     double xMod,yMod,xExp,yExp,Q2;
 
     totDiff = 0;
 
-    for(int i = 0; i < elem; i++)
+    for(int i = 0; i < ndf; i++)
     {
         mMod->GetPoint(i,xMod,yMod);
         totDiff += getClosest(xMod,iter,xExp,yExp);
@@ -77,7 +93,7 @@ double Compliance::Q2Test(double &totDiff)
             Q2 += (yMod*yMod - 2*yMod*yExp + yExp*yExp)/(yExp*yExp);
     }
 
-    return fabs(Q2)/elem;
+    return TMath::Abs(Q2)/ndf;
 }
 
 double Compliance::getClosest(double xVal, int &i, double &x, double &y)
@@ -87,14 +103,14 @@ double Compliance::getClosest(double xVal, int &i, double &x, double &y)
     double dist,distTemp;
 
     mExp->GetPoint(0,x,y);
-    dist = fabs(xVal-x);
+    dist = TMath::Abs(xVal-x);
     if(dist < numeric_limits<double>::epsilon()) // baisically means "if(xVal == x)" but for floating point variables
         return dist;
 
     for(int ii = 1; ii < elem; ii++)
     {
         mExp->GetPoint(ii,xx,yy);
-        distTemp = fabs(xVal-x);
+        distTemp = TMath::Abs(xVal-xx);
         if(distTemp < dist)
         {
             dist = distTemp;

@@ -14,18 +14,19 @@
 #include <TDatime.h>
 #include <TGraphErrors.h>
 #include <math.h>
-#include "Parser.h"
 #include "Accessibility.h"
 #include "Configurator.h"
-#include "THGlobal.h"
-#include "Messages.h"
 #include "HBTFit.h"
+#include "Messages.h"
+#include "Parser.h"
+#include "Storage.h"
+#include "THGlobal.h"
 
 using namespace std;
 
 Configurator* sMainConfig;
-Messages *msg;
 HBTFit *hbtFit;
+Storage *store;
 TString sMainINI,sPairType,sEventDir,sTimeStamp;
 int minkT,maxkT,firstkT,stepkT;
 double lowCut,highCut,lambda;
@@ -46,6 +47,7 @@ int main(int argc, char **argv)
     Int_t dofix[NoParams];  
     Double_t pars[NoParams],parmin[NoParams],parmax[NoParams],maxrange;
     Double_t maxx=0.0, maxy=0.0, maxz=0.0;
+    TString sOvvr;
     
     tDate.Set();
     sTimeStamp = tDate.AsSQLString();
@@ -56,19 +58,18 @@ int main(int argc, char **argv)
   
     minkT = 0;
     maxkT = 0;
-    msg = new Messages();
     
     if (argc > 1) 
     {
         tInRootName = argv[1];
         if(tInRootName.Contains("-h") || tInRootName.Contains("--help")) 
         {
-            msg->MessageHelp();
+            Messages::Help();
             return 0;
         } 
         else if(tInRootName.Contains("-v") || tInRootName.Contains("--version")) 
         {
-            msg->MessageVersion();
+            Messages::Version();
             return 0;
         }
         if (argc > 2) 
@@ -129,21 +130,13 @@ int main(int argc, char **argv)
     } 
     else 
     {
-        msg->MessageHelp();
+        Messages::Help();
         return _ERROR_GENERAL_FILE_NOT_FOUND_;
     }
 
-    msg->MessageIntro();  
+    Messages::Intro();  
 
-    sEventDir = tInRootName;
-    {
-        int tPos=0;
-        for(int i=1; i<sEventDir.Length(); i++) 
-            if(sEventDir[i]=='/')
-                tPos = i;
-        
-        sEventDir.Resize(tPos+1);
-    }
+    sEventDir = Accessibility::getEventDir(tInRootName);
 
 // ##############################################################
 // # Read configuration file (femtoFit.ini)			
@@ -170,6 +163,7 @@ int main(int argc, char **argv)
         denname1d  = sMainConfig->GetParameter("Denominator1D");
         firstkT = sMainConfig->GetParameter("FirstkT").Atoi();
         stepkT = sMainConfig->GetParameter("WidthkT").Atoi();
+        sOvvr = sMainConfig->GetParameter("Override");
     }
     catch (TString tError) 
     {
@@ -302,6 +296,8 @@ int main(int argc, char **argv)
 
         tInRootName = TString::Format("%sfemto%s%ia.root",sEventDir.Data(),partName.Data(),ii);
         tInRootFile = TFile::Open(tInRootName.Data());
+        if(tInRootFile == nullptr)
+            continue;
 
         numq1 = new TH1D(*((TH1D *) tInRootFile->Get(numname1d)));
         denq1 = new TH1D(*((TH1D *) tInRootFile->Get(denname1d)));
@@ -321,19 +317,18 @@ int main(int argc, char **argv)
         ratq->SetTitle("ratq");
         ratq->Fit(funqk, "RB");
 
-    // ##############################################################
-    // # Save fit values						
-    // ############################################################## 
+// ##############################################################
+// # Save fit values						
+// ############################################################## 
 
         TString   tOutTextName;
-        ofstream* tOutTextFile;
         double parVal,parErr,kTmiddle;
         
         tOutTextName = sEventDir + "hbtradii.txt";
-        tOutTextFile = new ofstream(tOutTextName);
-        (*tOutTextFile) << "["<<sTimeStamp<<"]\t" << tInRootName << endl;
-
-        
+        if(ii == minkT)
+            store = new Storage(tOutTextName, sOvvr);
+        else
+            store = new Storage(tOutTextName);
 
         PRINT_DEBUG_1("Fit results:");
         for (int iter = 0; iter < NoParams; iter++)
@@ -352,8 +347,8 @@ int main(int argc, char **argv)
                 if(iter == 3)
                     lambda = parVal;
             }
-            
-            (*tOutTextFile) << sParNames[iter] << "\t" << parVal << " +/- " << parErr << endl;
+
+            store->appendToTxt(sParNames[iter],parVal,parErr);
             if(lambda > lowCut && lambda < highCut)
             {
                 kTVal[iter].push_back(firstkT+(ii-minkT)*stepkT);
@@ -362,12 +357,11 @@ int main(int argc, char **argv)
             }
             PRINT_DEBUG_1("\t" + sParNames[iter] << parVal << " +/- " << parErr);
         }
-        tOutTextFile->close();
-        delete tOutTextFile;        
+        delete store;      
     
-    // ##############################################################
-    // # Make plots							
-    // ############################################################## 
+// ##############################################################
+// # Make plots							
+// ############################################################## 
 
         TH3D *fitnq;
 
@@ -530,9 +524,9 @@ int main(int argc, char **argv)
 
         //TO-DO: make plots for 1D correlation
 
-    // ##############################################################
-    // # Save plots							
-    // ##############################################################   
+// ##############################################################
+// # Save plots							
+// ##############################################################   
     
         TString   tOutRootName;
         TFile*    tOutRootFile = new TFile();
@@ -571,9 +565,11 @@ int main(int argc, char **argv)
         PRINT_MESSAGE("["<<tDate.AsSQLString()<<"]\tFile "<<tOutTextName<<" and");
         PRINT_MESSAGE("\tfile "<<tOutRootName<<" written.");
 
-    // ##############################################################
-    // # Log file entry 						
-    // ##############################################################
+        delete cancf;
+
+// ##############################################################
+// # Log file entry 						
+// ##############################################################
 
         {
             TString  tLogName;
@@ -607,14 +603,15 @@ int main(int argc, char **argv)
             }    
         }
     
-    // ##############################################################
-    // # Temporary file						
-    // ##############################################################  
+// ##############################################################
+// # Temporary file						
+// ##############################################################  
 
         ofstream tTmpFile;
-        char     tTmpFileName[kFileNameMaxChar];
+        TString tTmpFileName;
         
-        sprintf(tTmpFileName,"./hbtfit_%s.tmp",sPairType.Data());
+        //sprintf(tTmpFileName,"./hbtfit_%s.tmp",sPairType.Data());
+        tTmpFileName = TString::Format("./hbtfit_%s.tmp",sPairType.Data()); 
         tTmpFile.open(tTmpFileName, ios_base::app);
         if((tTmpFile) && tTmpFile.is_open()) 
             tTmpFile << tOutRootName << endl;

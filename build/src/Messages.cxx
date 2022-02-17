@@ -4,15 +4,7 @@
 
 using namespace std;
 
-Messages::Messages()
-{
-}
-
-Messages::~Messages()
-{
-}
-
-void Messages::MessageIntro()
+void Messages::Intro()
 {
     PRINT_MESSAGE("  _______ _    _ ______ _____  __  __ _____ _   _          _____ ____  _____  _____  ");
     PRINT_MESSAGE(" |__   __| |  | |  ____|  __ \\|  \\/  |_   _| \\ | |   /\\   / ____/ __ \\|  __ \\|  __ \\ ");
@@ -21,16 +13,16 @@ void Messages::MessageIntro()
     PRINT_MESSAGE("    | |  | |  | | |____| | \\ \\| |  | |_| |_| |\\  |/ ____ \\ |___| |__| | | \\ \\| | \\ \\ ");
     PRINT_MESSAGE("    |_|  |_|  |_|______|_|  \\_\\_|  |_|_____|_| \\_/_/    \\_\\_____\\____/|_|  \\_\\_|  \\_\\");
     PRINT_MESSAGE("");
-    PRINT_MESSAGE("  ***********************************************************************"	);
-    PRINT_MESSAGE("  *\t\t1D and 3D HBT fit for THERMINATOR 2, version "<<_THERMINACORR_VERSION_<<"\t\t\t*"	);
-    PRINT_MESSAGE("  *\t\t\t\t\t\t\t\t\t*"							);
-    PRINT_MESSAGE("  * source code based on: THERMINATOR 2 \t\t*"		);
-    PRINT_MESSAGE("  * author: Jedrzej Kolas\t\t*"		);
-    PRINT_MESSAGE("  * Please don't sue me, I have a family.\t\t*"				);
-    PRINT_MESSAGE("  ***********************************************************************"	);
+    PRINT_MESSAGE("  ***********************************************************************");
+    PRINT_MESSAGE("  *         1D and 3D HBT fit for THERMINATOR 2, version "<<_THERMINACORR_VERSION_<<"          *");
+    PRINT_MESSAGE("  *                                                                     *");
+    PRINT_MESSAGE("  * source code based on: THERMINATOR 2                                 *");
+    PRINT_MESSAGE("  * author: Jedrzej Kolas                                               *");
+    PRINT_MESSAGE("  * Please don't sue me, I have a family.                               *");
+    PRINT_MESSAGE("  ***********************************************************************");
 }
 
-void Messages::MessageHelp()
+void Messages::Help()
 {
     PRINT_MESSAGE("Usage: ");
     PRINT_MESSAGE("thermiCorr <FOLDER_PATH> <PAIR_TYPE> <KT_MIN> <KT_MAX> [HBTFIT_INI]");
@@ -45,7 +37,7 @@ void Messages::MessageHelp()
     PRINT_MESSAGE("    -v | --version\tversion information");
 }
 
-void Messages::MessageHelpQ2()
+void Messages::HelpQ2()
 {
     PRINT_MESSAGE("Usage: ");
     PRINT_MESSAGE("Q2test <FILE_PATH> [Q2TEST_INI]");
@@ -57,7 +49,7 @@ void Messages::MessageHelpQ2()
     PRINT_MESSAGE("    -v | --version\tversion information");
 }
 
-void Messages::MessageVersion()
+void Messages::Version()
 {
     PRINT_MESSAGE("version:\tTherminacorr version "<<_THERMINACORR_VERSION_);
     PRINT_MESSAGE("compiled with:\t"<<_CXX_VER_<<", ROOT("<<_ROOT_VER_<<")");

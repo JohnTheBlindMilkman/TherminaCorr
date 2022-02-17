@@ -12,12 +12,12 @@ vpath %.o   $(DIR_OBJ)
 
 # file lists
 BIN_FEMTO  = thermiCorr
-HSRC_FEMTO = Configurator.cxx Parser.cxx Messages.cxx HBTFit.cxx Accessibility.cxx
+HSRC_FEMTO = Accessibility.cxx Configurator.cxx HBTFit.cxx Messages.cxx Parser.cxx Storage.cxx
 SRC_FEMTO  = $(HSRC_FEMTO:%=$(DIR_CXX)%) $(BIN_FEMTO:%=$(DIR_CXX)%.cxx)
 OBJ_FEMTO  = $(SRC_FEMTO:$(DIR_CXX)%.cxx=$(DIR_OBJ)%.o)
 
 BIN_Q2  = Q2test
-HSRC_Q2 = Configurator.cxx Parser.cxx Messages.cxx Accessibility.cxx Compliance.cxx
+HSRC_Q2 = Accessibility.cxx Compliance.cxx Configurator.cxx Messages.cxx Parser.cxx Storage.cxx
 SRC_Q2  = $(HSRC_Q2:%=$(DIR_CXX)%) $(BIN_Q2:%=$(DIR_CXX)%.cxx)
 OBJ_Q2  = $(SRC_Q2:$(DIR_CXX)%.cxx=$(DIR_OBJ)%.o)
 
@@ -38,8 +38,8 @@ all: $(BIN_FEMTO:%=$(DIR_OBJ)%) $(BIN_Q2:%=$(DIR_OBJ)%)
 	cp $^ $(DIR_MAIN)
 	echo
 	echo "Ready!"
-	echo "Type \"./thermiCorr\" to generate two-particle corelation function,"
-	echo "Type \"./Q2test\" to fit and extract HBT radii."
+	echo "Type \"./thermiCorr\" to fit and extract HBT radii,"
+	echo "Type \"./Q2test\" to perform compliance test."
 	echo
 
 $(DIR_OBJ)thermiCorr: $(OBJ_FEMTO)
@@ -60,3 +60,5 @@ clean:
 	rm -f $(DIR_OBJ)$(BIN_FEMTO) $(DIR_MAIN)$(BIN_FEMTO)
 	rm -f $(DIR_OBJ)$(BIN_Q2) $(DIR_MAIN)$(BIN_Q2)
 	echo "*.o and binary files removed."
+
+.SILENT :

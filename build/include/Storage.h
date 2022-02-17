@@ -10,7 +10,7 @@
     {
         public:
             Storage();
-            Storage(TString sFileNam);
+            Storage(TString sFileNam,TString ovrrd = "false");
             ~Storage();
 
             void appendToTxt(TString sValName, double parVal, double parErr);

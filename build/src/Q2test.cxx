@@ -1,40 +1,40 @@
 #include <iostream>
 #include <TString.h>
-#include "Parser.h"
-#include "Messages.h"
-#include "Configurator.h"
 #include "Accessibility.h"
-#include "THGlobal.h"
 #include "Compliance.h"
+#include "Configurator.h"
+#include "Messages.h"
+#include "Parser.h"
+#include "THGlobal.h"
+#include "Storage.h"
 
 using namespace std;
 
 int main(int argc, char **argv)
 {
-// ##############################################################
-// # Constants definition					
-// ##############################################################
+    // ##############################################################
+    // # Constants definition					
+    // ##############################################################
 
     const TString sParList[] = {"LambdaInv","RadiusInv","LambdaOSL","RadiusOut","RadiusSide","RadiusLong"};
     const int len = (int) sizeof(sParList)/sizeof(sParList[0]);
 
-// ##############################################################
-// # Variable initialisation					
-// ##############################################################
+    // ##############################################################
+    // # Variable initialisation					
+    // ##############################################################
 
     int noGraphs,minkT,maxkT;
-    TString sFilePath,sMainINI,sEventDir,sExpFilePath,sParam,sModelName,sExpGraphName[len];  
+    TString sFilePath,sMainINI,sEventDir,sExpFilePath,sParam,sModelName,sExpGraphName[len],sOvrrd;  
     Configurator *sMainConfig;
-    Messages *msg;
     Accessibility *accss;
     Compliance *comp;
     Parser *tParser;
+    Storage *store;
 
-// ##############################################################
-// # Command line analysis					
-// ##############################################################
+    // ##############################################################
+    // # Command line analysis					
+    // ##############################################################
 
-    msg = new Messages();
     sMainINI = "./Q2test.ini";
 
     if(argc > 1)
@@ -42,12 +42,12 @@ int main(int argc, char **argv)
         sFilePath = argv[1];
         if(sFilePath.Contains("-h") || sFilePath.Contains("--help")) 
         {
-            msg->MessageHelpQ2();
+            Messages::HelpQ2();
             return 0;
         }
         else if(sFilePath.Contains("-v") || sFilePath.Contains("--version")) 
         {
-            msg->MessageVersion();
+            Messages::Version();
             return 0;
         }
         if(argc > 2)
@@ -58,36 +58,28 @@ int main(int argc, char **argv)
     }
     else 
     {
-        msg->MessageHelp();
+        Messages::HelpQ2();
         return _ERROR_GENERAL_FILE_NOT_FOUND_;
     }
 
-    msg->MessageIntro();  
+    Messages::Intro();  
 
-    sEventDir = sFilePath;
-    {
-        int tPos=0;
-        for(int i=1; i<sEventDir.Length(); i++) 
-            if(sEventDir[i]=='/')
-                tPos = i;
-        
-        sEventDir.Resize(tPos+1);
-    }
+    sEventDir = Accessibility::getEventDir(sFilePath);
 
-// ##############################################################
-// # Read configuration file (femtoFit.ini)			
-// ############################################################## 
+    // ##############################################################
+    // # Read configuration file (femtoFit.ini)			
+    // ############################################################## 
 
     sMainConfig = new Configurator;
     tParser = new Parser(sMainINI);
     tParser->ReadINI(sMainConfig);
     delete tParser;
   
-// ##############################################################
-// # ReadParameters						
-// ##############################################################  
+    // ##############################################################
+    // # ReadParameters						
+    // ##############################################################  
 
-    accss = new Accessibility();
+    accss = new Accessibility;
     noGraphs = 0;
 
     try 
@@ -103,6 +95,8 @@ int main(int argc, char **argv)
         
         minkT = sMainConfig->GetParameter("MinkT").Atoi();
         maxkT = sMainConfig->GetParameter("MaxkT").Atoi(); 
+
+        sOvrrd = sMainConfig->GetParameter("Override");
     }
     catch (TString tError) 
     {
@@ -119,21 +113,22 @@ int main(int argc, char **argv)
         exit(0);
     }
 
-// ##############################################################
-// # Fit
-// ############################################################## 
+    // ##############################################################
+    // # Fit
+    // ##############################################################
+
+    store = new Storage(sEventDir + "Q2result.txt",sOvrrd);
     
     for(int i = 0; i < len; i++)
     {
         if(Compliance::getModelName(sExpGraphName[i],i,minkT,maxkT,sModelName))
         {
             comp = new Compliance(sFilePath,sModelName,sExpFilePath,sExpGraphName[i]);
-            comp->printResult(true);
-            comp->~Compliance();
+            store->appendToTxt(sModelName,comp->printResult(true));
+            delete comp;
         }
     }
-    
 
-
+    delete store;
     return 0;
 }

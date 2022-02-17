@@ -52,3 +52,15 @@ void Accessibility::CopyINIFile(TString sMainINI, TString sEventDir)
     else
         PRINT_MESSAGE("<therm2_events::main()>\tUnable to copy "<<sMainINI<<" to "<<tINI);
 }
+
+TString Accessibility::getEventDir(TString sFilePath)
+{
+    int tPos=0;
+    for(int i=1; i<sFilePath.Length(); i++) 
+        if(sFilePath[i]=='/')
+            tPos = i;
+    
+    sFilePath.Resize(tPos+1);
+
+    return sFilePath;
+}
