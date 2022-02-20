@@ -49,6 +49,48 @@ void Messages::HelpQ2()
     PRINT_MESSAGE("    -v | --version\tversion information");
 }
 
+void Messages::Summary(double low, double high, vector<TString> files, vector<Summ> su)
+{
+    PRINT_MESSAGE("===============================================================================");
+
+    if(files.empty() && su.empty())
+    {
+        PRINT_MESSAGE("Everything was successful");
+    }
+    else
+    {
+        if(!files.empty())
+        {
+            PRINT_MESSAGE("Files that were not found: ");
+            for(auto it = begin(files); it != end(files); it++)
+            {
+                PRINT_MESSAGE(&it);
+            }
+            PRINT_MESSAGE("");
+            PRINT_MESSAGE("");
+        }
+        if(!su.empty())
+        {
+            char inv, osl;
+            
+            PRINT_MESSAGE("Fits outside bounds, where lambda is not in (" << low << ", " << high << "):");
+            PRINT_MESSAGE("                   " << "kT bin" << "            " << "Lambda Inv" << "        " << "Lambda OSL");
+            for(auto it = begin(su); it != end(su); it++)
+            {
+                inv = ' ';
+                osl = ' ';
+                if(it->Linv)
+                    inv = '+';
+                if(it->Losl)
+                    osl = '+';
+                PRINT_MESSAGE("                     " << it->kT << "             " << inv << "                   " << osl);
+            }
+        }
+    }
+
+    PRINT_MESSAGE("===============================================================================");
+}
+
 void Messages::Version()
 {
     PRINT_MESSAGE("version:\tTherminacorr version "<<_THERMINACORR_VERSION_);

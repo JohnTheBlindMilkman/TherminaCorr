@@ -39,22 +39,17 @@ void figureQ2Fit()
 
     canv = new TCanvas("canv","canv",800,1000);
     canv->Divide(1,4);
-    //tLeg = new TLegend(0.8,0.7,0.9,0.9);
 
     for(int i = 0; i < 4; i++)
     {
         canv->cd(i+1);
         gRes[i] = new TGraph(noE,epsVal,&yVal[i][0]);
         gRes[i]->SetMarkerStyle(20);
+        gRes[i]->SetMarkerColor(kRed);
+        gRes[i]->SetLineColor(kBlack);
         gRes[i]->SetTitle(rName[i].Data());
         gRes[i]->GetXaxis()->SetRangeUser(-0.7,0.1);
-        //tLeg->AddEntry(gRes[i],rName[i].Data());
-        //if(i == 0)
-            gRes[i]->Draw("apl plc pmc");
-        //else
-        //gRes[i]->Draw("same pl plc pmc");
-        //canv->Modified();
-        //canv->Update();
+        
+        gRes[i]->Draw("apl");
     }
-    //tLeg->Draw("same");
 }

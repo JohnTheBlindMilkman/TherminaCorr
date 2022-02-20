@@ -4,6 +4,7 @@ DIR_BUILD   = $(DIR_MAIN)build/
 DIR_H       = $(DIR_BUILD)include/
 DIR_OBJ     = $(DIR_BUILD)obj/
 DIR_CXX     = $(DIR_BUILD)src/
+DIR_MAC     = $(DIR_MAIN)macros/
 
 # search paths
 vpath %.h   $(DIR_H)
@@ -57,8 +58,11 @@ $(DIR_OBJ)%.o: %.cxx
 
 clean:
 	rm -f $(DIR_OBJ)*.o
+	rm -f $(DIR_MAC)*.d
+	rm -f $(DIR_MAC)*.so
+	rm -f $(DIR_MAC)*.pcm
 	rm -f $(DIR_OBJ)$(BIN_FEMTO) $(DIR_MAIN)$(BIN_FEMTO)
 	rm -f $(DIR_OBJ)$(BIN_Q2) $(DIR_MAIN)$(BIN_Q2)
-	echo "*.o and binary files removed."
+	echo "*.o, *.so, *.d, *.pcm and binary files removed."
 
 .SILENT :

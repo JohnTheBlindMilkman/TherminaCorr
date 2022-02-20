@@ -48,6 +48,9 @@ int main(int argc, char **argv)
     Double_t pars[NoParams],parmin[NoParams],parmax[NoParams],maxrange;
     Double_t maxx=0.0, maxy=0.0, maxz=0.0;
     TString sOvvr;
+    bool losl,linv;
+    vector<Messages::Summ> outOfBound;
+    vector<TString> missFiles;
     
     tDate.Set();
     sTimeStamp = tDate.AsSQLString();
@@ -297,8 +300,11 @@ int main(int argc, char **argv)
         tInRootName = TString::Format("%sfemto%s%ia.root",sEventDir.Data(),partName.Data(),ii);
         tInRootFile = TFile::Open(tInRootName.Data());
         if(tInRootFile == nullptr)
+        {
+            missFiles.push_back(tInRootName);
             continue;
-
+        }
+            
         numq1 = new TH1D(*((TH1D *) tInRootFile->Get(numname1d)));
         denq1 = new TH1D(*((TH1D *) tInRootFile->Get(denname1d)));
         ratq1 = new TH1D(*numq1);
@@ -323,6 +329,8 @@ int main(int argc, char **argv)
 
         TString   tOutTextName;
         double parVal,parErr,kTmiddle;
+        linv = false;
+        losl = false;
         
         tOutTextName = sEventDir + "hbtradii.txt";
         if(ii == minkT)
@@ -355,9 +363,19 @@ int main(int argc, char **argv)
                 parVals[iter].push_back(parVal);
                 parErrs[iter].push_back(parErr);
             }
+            else
+            {
+                if(iter == 0)
+                    linv = true;
+                else if(iter == 3)
+                    losl = true;
+            }
             PRINT_DEBUG_1("\t" + sParNames[iter] << parVal << " +/- " << parErr);
         }
-        delete store;      
+        delete store;    
+
+        if(linv || losl)
+            outOfBound.push_back({ii,linv,losl});  
     
 // ##############################################################
 // # Make plots							
@@ -631,6 +649,8 @@ int main(int argc, char **argv)
     }
     
     paramFile->Close();
+
+    Messages::Summary(lowCut,highCut,missFiles,outOfBound);
 
     return 0;
 }
