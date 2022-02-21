@@ -1,19 +1,11 @@
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include <TH1D.h>
 #include <TH3D.h>
 #include <TFile.h>
 #include <TF1.h>
 #include <TF3.h>
-#include <TGraph.h>
 #include <TPad.h>
 #include <TCanvas.h>
-#include <TImage.h>
-#include <TMath.h>
-#include <TDatime.h>
 #include <TGraphErrors.h>
-#include <math.h>
 #include "Accessibility.h"
 #include "Configurator.h"
 #include "HBTFit.h"
@@ -24,33 +16,24 @@
 
 using namespace std;
 
-Configurator* sMainConfig;
-HBTFit *hbtFit;
-Storage *store;
-TString sMainINI,sPairType,sEventDir,sTimeStamp;
-int minkT,maxkT,firstkT,stepkT;
-double lowCut,highCut,lambda;
-
-TH3D *ratq;
-TH1D *ratq1;
-
-TF3 *funqg,*funqk;
-TF1 *funqg1,*funqk1;
-TGraph *kcoul;
-
-Accessibility *accss = new Accessibility();
-
 int main(int argc, char **argv)
 {
+    Configurator* sMainConfig;
+    HBTFit *hbtFit;
+    Storage *store;
+    TH3D *ratq;
+    TH1D *ratq1;
+    TF3 *funqg,*funqk;
+    TF1 *funqg1,*funqk1;
     TDatime tDate;
-    TString tInRootName,numname,denname,numname1d,denname1d,partName;
-    Int_t dofix[NoParams];  
-    Double_t pars[NoParams],parmin[NoParams],parmax[NoParams],maxrange;
-    Double_t maxx=0.0, maxy=0.0, maxz=0.0;
-    TString sOvvr;
+    TString tInRootName,numname,denname,numname1d,denname1d,partName,sMainINI,sPairType,sEventDir,sTimeStamp,sOvvr;
     bool losl,linv;
+    int minkT,maxkT,firstkT,stepkT,dofix[NoParams];
+    double lowCut,highCut,lambda,pars[NoParams],parmin[NoParams],parmax[NoParams],maxrange,maxx=0.0, maxy=0.0, maxz=0.0;
     vector<Messages::Summ> outOfBound;
     vector<TString> missFiles;
+
+    Accessibility *accss = new Accessibility();
     
     tDate.Set();
     sTimeStamp = tDate.AsSQLString();
@@ -628,7 +611,6 @@ int main(int argc, char **argv)
         ofstream tTmpFile;
         TString tTmpFileName;
         
-        //sprintf(tTmpFileName,"./hbtfit_%s.tmp",sPairType.Data());
         tTmpFileName = TString::Format("./hbtfit_%s.tmp",sPairType.Data()); 
         tTmpFile.open(tTmpFileName, ios_base::app);
         if((tTmpFile) && tTmpFile.is_open()) 
