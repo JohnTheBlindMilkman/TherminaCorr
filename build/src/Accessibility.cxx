@@ -50,7 +50,7 @@ void Accessibility::CopyINIFile(TString sMainINI, TString sEventDir)
         ofs.close();
     } 
     else
-        PRINT_MESSAGE("<therm2_events::main()>\tUnable to copy "<<sMainINI<<" to "<<tINI);
+        PRINT_MESSAGE("<Accessibility::CopyINIFile()>\tUnable to copy "<<sMainINI<<" to "<<tINI);
 }
 
 TString Accessibility::getEventDir(TString sFilePath)

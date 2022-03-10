@@ -24,7 +24,7 @@ int main(int argc, char **argv)
     // ##############################################################
 
     int noGraphs,minkT,maxkT;
-    TString sFilePath,sMainINI,sEventDir,sExpFilePath,sParam,sModelName,sExpGraphName[len],sOvrrd;  
+    TString sFilePath,sMainINI,sEventDir,sExpFilePath,sParam,sModelName,sExpGraphName[len],sOvrrd,sTest;  
     Configurator *sMainConfig;
     Accessibility *accss;
     Compliance *comp;
@@ -97,6 +97,8 @@ int main(int argc, char **argv)
         maxkT = sMainConfig->GetParameter("MaxkT").Atoi(); 
 
         sOvrrd = sMainConfig->GetParameter("Override");
+
+        sTest = sMainConfig->GetParameter("Test");
     }
     catch (TString tError) 
     {
@@ -124,7 +126,7 @@ int main(int argc, char **argv)
         if(Compliance::getModelName(sExpGraphName[i],i,minkT,maxkT,sModelName))
         {
             comp = new Compliance(sFilePath,sModelName,sExpFilePath,sExpGraphName[i]);
-            store->appendToTxt(sModelName,comp->printResult(true));
+            store->appendToTxt(sModelName,comp->printResult(sTest,true));
             delete comp;
         }
     }

@@ -29,7 +29,7 @@ int main(int argc, char **argv)
     TString tInRootName,numname,denname,numname1d,denname1d,partName,sMainINI,sPairType,sEventDir,sTimeStamp,sOvvr;
     bool losl,linv;
     int minkT,maxkT,firstkT,stepkT,dofix[NoParams];
-    double lowCut,highCut,lambda,pars[NoParams],parmin[NoParams],parmax[NoParams],maxrange,maxx=0.0, maxy=0.0, maxz=0.0;
+    double limShift,lowCut,highCut,lambda,pars[NoParams],parmin[NoParams],parmax[NoParams],maxrange,maxx=0.0, maxy=0.0, maxz=0.0;
     vector<Messages::Summ> outOfBound;
     vector<TString> missFiles;
 
@@ -229,24 +229,7 @@ int main(int argc, char **argv)
         funqg->SetRange(-maxrange, -maxrange, -maxrange, maxrange, maxrange, maxrange);
     
     funqk = funqg;
-    for (int iter = 2; iter < NoParams; iter++)
-    {
-        iter2 = iter-2;
-        if (dofix[iter]) 
-        {
-            if (dofix[iter] == 2) 
-            {
-                funqk->SetParLimits(iter2, parmin[iter], parmax[iter]);
-                funqk->SetParameter(iter2, pars[iter]);
-            }
-            else
-                funqk->FixParameter(iter2, pars[iter]);
-        }
-        else
-            funqk->SetParameter(iter2, pars[iter]);
-
-        funqk->SetParName(iter2, sParNames[iter]);
-    }
+    
 
     funqg1 = new TF1("funqg1",hbtFit, &HBTFit::fungek1D, -0.15, 0.15, 3);
     if (maxx > 0)
@@ -273,10 +256,48 @@ int main(int argc, char **argv)
         funqk1->SetParName(iter, sParNames[iter]);
     }
     
-    
-
     for(int ii = minkT; ii <= maxkT; ii++)
     {
+        for (int iter = 2; iter < NoParams; iter++)
+        {
+            iter2 = iter-2;
+            if (dofix[iter]) 
+            {
+                if (dofix[iter] == 2) 
+                {
+                    if(iter == 4)
+                    {
+                        limShift = (ii-minkT)*0.40;
+                        funqk->SetParLimits(iter2, parmin[iter]-limShift, parmax[iter]-limShift);
+                        funqk->SetParameter(iter2, pars[iter]-limShift);
+                    }
+                    else if(iter == 5)
+                    {
+                        limShift = (ii-minkT)*0.20;
+                        funqk->SetParLimits(iter2, parmin[iter]-limShift, parmax[iter]-limShift);
+                        funqk->SetParameter(iter2, pars[iter]-limShift);
+                    }
+                    else if(iter == 6)
+                    {
+                        limShift = (ii-minkT)*0.25;
+                        funqk->SetParLimits(iter2, parmin[iter]-limShift, parmax[iter]-limShift);
+                        funqk->SetParameter(iter2, pars[iter]-limShift);
+                    }
+                    else
+                    {
+                        funqk->SetParLimits(iter2, parmin[iter], parmax[iter]);
+                        funqk->SetParameter(iter2, pars[iter]);
+                    }
+                }
+                else
+                    funqk->FixParameter(iter2, pars[iter]);
+            }
+            else
+                funqk->SetParameter(iter2, pars[iter]);
+
+            funqk->SetParName(iter2, sParNames[iter]);
+        }
+
         lambda = 0;
         PRINT_MESSAGE("["<<sTimeStamp<<"]\tFitting.");
 
@@ -295,7 +316,7 @@ int main(int argc, char **argv)
         ratq1->Divide(numq1, denq1, 1.0, 1.0);
         ratq1->SetName("ratq1");
         ratq1->SetTitle("ratq1");
-        ratq1->Fit(funqk1, "RB");
+        ratq1->Fit(funqk1, "RBMPE");
 
         numq = new TH3D(*((TH3D *) tInRootFile->Get(numname)));
         denq = new TH3D(*((TH3D *) tInRootFile->Get(denname)));
@@ -304,7 +325,7 @@ int main(int argc, char **argv)
         ratq->Divide(numq, denq, 1.0, 1.0);
         ratq->SetName("ratq");
         ratq->SetTitle("ratq");
-        ratq->Fit(funqk, "RB");
+        ratq->Fit(funqk, "RBMPE");
 
 // ##############################################################
 // # Save fit values						
@@ -364,7 +385,7 @@ int main(int argc, char **argv)
 // # Make plots							
 // ############################################################## 
 
-        TH3D *fitnq;
+        TH3D *fitnq; 
 
         TH1D *hpx1 = hbtFit->getproj(numq, denq, 0, 0, pars[0]);
         TH1D *hpy1 = hbtFit->getproj(numq, denq, 1, 0, pars[0]);
@@ -522,8 +543,6 @@ int main(int argc, char **argv)
 
         hpz3->Draw("HISTPE1");
         fpz3->Draw("SAMEHISTL");
-
-        //TO-DO: make plots for 1D correlation
 
 // ##############################################################
 // # Save plots							

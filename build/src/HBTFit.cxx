@@ -80,20 +80,24 @@ TH1D* HBTFit::getproj(TH3D *numq, TH3D *denq, int nproj, int wbin, double norm)
     {
         case 0:
             sProj = "x";
+            denq->GetXaxis()->SetRange(1,numq->GetNbinsX());
+            numq->GetXaxis()->SetRange(1,numq->GetNbinsX());
             break;
         case 1:
             sProj = "y";
+            denq->GetYaxis()->SetRange(1,numq->GetNbinsY());
+            numq->GetYaxis()->SetRange(1,numq->GetNbinsY());
             break;
         case 2:
             sProj = "z";
+            denq->GetZaxis()->SetRange(1,numq->GetNbinsZ());
+            numq->GetZaxis()->SetRange(1,numq->GetNbinsZ());
             break;
         default:
             PRINT_MESSAGE("Error: Unknown projection type");
             exit(_ERROR_GENERAL_UNSUPORTED_VALUE_);
     }
     
-    denq->GetXaxis()->SetRange(1,numq->GetNbinsX());
-    numq->GetXaxis()->SetRange(1,numq->GetNbinsX());
     denbuf = new TH1D(*((TH1D *) denq->Project3D(sProj)));
     numbuf = new TH1D(*((TH1D *) numq->Project3D(sProj)));
 

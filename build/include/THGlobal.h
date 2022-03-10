@@ -19,7 +19,7 @@ static const TString sParNames[NoParams] = {"LambdaInv","Rinv","Norm","LambdaOSL
 
 // Define version of THERMINATOR 2
 
-#define _THERMINACORR_VERSION_  "1.3.1"
+#define _THERMINACORR_VERSION_  "EXP - 1.4.0"
 
 // Define compilation specific variables
 
