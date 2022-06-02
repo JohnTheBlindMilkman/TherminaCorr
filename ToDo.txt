@@ -1,0 +1,3 @@
+TO-DO: make plots for 1D correlation
+TO-DO: move function plotting to HBTFit.cxx
+TO-DO: make radius limits shift accordingly to decreasing radius value for consecuting kT bins (R decreases with kT)

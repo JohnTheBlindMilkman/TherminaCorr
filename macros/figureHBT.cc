@@ -60,7 +60,7 @@ void figureHBT()
 {  
     gStyle->SetPalette(kDeepSea);
 
-    const TString folderPath = "/home/jedkol/Downloads/modelSR/HBT/MotoMoto";
+    const TString folderPath = "/home/jedkol/Downloads/modelSR/HBT/LowTemp";
     const TString tName[] = {"#pi^{+} - #pi^{+}","#pi^{-} - #pi^{-}","#pi^{0} - #pi^{0}"};
     const TString pName[] = {"pipi","piMpiM","pi0pi0"};
     const TString fName[] = {"pipi","pimpim","pi0pi0"};
@@ -69,27 +69,16 @@ void figureHBT()
     const TString expName[] = {"geExpInv","geExpO","geExpS","geExpL","geExpLamInv","geLamosl"};
     const TString rName[] = {"R_{inv}","R_{out}","R_{side}","R_{long}","#lambda_{inv}","#lambda_{osl}"};
     const double epsVal[] = {0.0,-0.1,-0.2,-0.3,-0.4,-0.5,-0.6};
-    const double Xmin[] = {0.35,0.15,0.35,0.15,0.35,0.15}, Ymin[] = {0.15,0.15,0.15,0.75,0.35,0.35}, Xmax[] = {0.45,0.25,0.45,0.25,0.45,0.25}, Ymax[] = {0.25,0.25,0.25,0.85,0.45,0.45};
-    const int NoExp = 3, NoMod = 7;
+    const int NoExp = 3, NoMod = 4;
 
     TGraphErrors *gModel[NoMod][nPads];
     TGraphAsymmErrors *gaeExp[NoExp][nPads];
     TFile *fExpData,*fModelData;
-    TPaveText *rType[nPads];
-    TText *txt[nPads];
     TLegend *legExp,*legMod;
     TCanvas *c1;
     TVirtualPad *tvp;
     int maxExpGraph;
     TString drawCom;
-
-    for(int i = 0; i < nPads; i ++) //prepare text labels
-    {
-        rType[i] = new TPaveText(Xmin[i],Ymin[i],Xmax[i],Ymax[i],"NDC");
-        rType[i]->SetFillColor(0);
-        txt[i] = rType[i]->AddText(rName[i].Data());
-        txt[i]->SetTextColor(2);
-    }
 
     for(int i = 0; i < NoExp; i++)  //input experimental data
     {
@@ -107,7 +96,7 @@ void figureHBT()
 
     for(int i = 0; i < NoMod; i++)  //input model data
     {
-        fModelData = TFile::Open(Form("%s/H160%sD4femto/parameterFit%s.root",folderPath.Data(),epsType[i].Data(),pName[0].Data()),"read");
+        fModelData = TFile::Open(Form("%s/H100%sD2femto/parameterFit%s.root",folderPath.Data(),epsType[i].Data(),pName[0].Data()),"read");
         if(fModelData->IsOpen())
         {
             cout << "File " << Form("parameterFit%s.root",pName[0].Data()) << " is open" << endl;
@@ -123,7 +112,7 @@ void figureHBT()
     c1->SetMargin(0.,0.,0.2,0.2);
     c1->Divide(2,3,0,0);
 
-    legExp = new TLegend(0.8,0.7,1.,1.);
+    legExp = new TLegend(0.75,0.65,1.,1.);
     legMod = new TLegend(0.6,0.5,0.8,1.);
 
     for(int i = 0; i < nPads; i++)
@@ -133,8 +122,12 @@ void figureHBT()
         gaeExp[0][i]->GetXaxis()->SetNdivisions(508);
         gaeExp[0][i]->GetYaxis()->SetNdivisions(505);
 
-        gaeExp[0][i]->GetYaxis()->SetLabelFont(62);
+        gaeExp[0][i]->GetYaxis()->SetLabelFont(42);
         gaeExp[0][i]->GetYaxis()->SetLabelOffset();
+
+        gaeExp[0][i]->GetYaxis()->SetTitle(Form("%s %s",rName[i].Data(),"[fm]"));
+        gaeExp[0][i]->GetYaxis()->SetTitleOffset(0.8);
+        gaeExp[0][i]->GetYaxis()->CenterTitle(true);
             
         if(i > 3)
         {
@@ -142,30 +135,26 @@ void figureHBT()
             gaeExp[0][i]->GetXaxis()->SetTitleSize(0.08);
             gaeExp[0][i]->GetXaxis()->SetTitleOffset(1.1);
             gaeExp[0][i]->GetXaxis()->SetLabelSize(0.08);
-            gaeExp[0][i]->GetXaxis()->SetLabelFont(62);
+            gaeExp[0][i]->GetXaxis()->SetLabelFont(42);
             gaeExp[0][i]->GetXaxis()->SetLabelOffset();
 
             gaeExp[0][i]->GetYaxis()->SetTitleSize(0.09);
+            gaeExp[0][i]->GetYaxis()->SetTitleOffset(0.85);
             gaeExp[0][i]->GetYaxis()->SetLabelSize(0.08);
+            gaeExp[0][i]->GetYaxis()->SetLabelOffset(0.01);
         }
         else
         {
             gaeExp[0][i]->GetYaxis()->SetTitleSize(0.1);
+            gaeExp[0][i]->GetYaxis()->SetTitleOffset(0.85);
             gaeExp[0][i]->GetYaxis()->SetLabelSize(0.1);
+            gaeExp[0][i]->GetYaxis()->SetLabelOffset(0.01);
         }
 
         if(i == 0 || i == 2 || i == 4)
-        {
-            gaeExp[0][i]->GetYaxis()->SetTitle(Form("%s %s",rName[i].Data(),"[fm]"));
-            gaeExp[0][i]->GetYaxis()->SetTitleOffset(0.8);
-            gaeExp[0][i]->GetYaxis()->CenterTitle(true);
-
             tvp->SetLeftMargin(0.2);
-        }
         else
-        {
             tvp->SetRightMargin(0.2);
-        }
 
         if(i < 4)
             maxExpGraph = 3;
@@ -196,7 +185,6 @@ void figureHBT()
                     legExp->AddEntry(gaeExp[j][i],tName[j].Data(),"p");
             }
         }
-        rType[i]->Draw("same");
 
         for(int j = 0; j < NoMod; j++)
         {
