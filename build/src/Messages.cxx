@@ -64,10 +64,13 @@ void Messages::Summary(double low, double high, vector<TString> files, vector<Su
             PRINT_MESSAGE("Files that were not found: ");
             for(auto it = begin(files); it != end(files); it++)
             {
-                PRINT_MESSAGE(&it);
+                PRINT_MESSAGE(*it);
             }
-            PRINT_MESSAGE("");
-            PRINT_MESSAGE("");
+            if(!su.empty())
+            {
+                PRINT_MESSAGE("");
+                PRINT_MESSAGE("");
+            }
         }
         if(!su.empty())
         {
@@ -93,11 +96,11 @@ void Messages::Summary(double low, double high, vector<TString> files, vector<Su
 
 void Messages::Version()
 {
-    PRINT_MESSAGE("version:\tTherminacorr version "<<_THERMINACORR_VERSION_);
-    PRINT_MESSAGE("compiled with:\t"<<_CXX_VER_<<", ROOT("<<_ROOT_VER_<<")");
-    std::cout <<  "  preprocessor: ";
+    PRINT_MESSAGE("version:\t"<<_THERMINACORR_VERSION_);
+    PRINT_MESSAGE("compiled with:");
+    PRINT_MESSAGE("\t\t"<<_CXX_VER_);
+    PRINT_MESSAGE("\t\tROOT("<<_ROOT_VER_<<")");
 #ifdef _DEBUG_LEVEL_
-    std::cout << "DEBUG="<<_DEBUG_LEVEL_<<" ";
+    PRINT_MESSAGE("DEBUG=\t"<<_DEBUG_LEVEL_);
 #endif
-    std::cout << std::endl;
 }

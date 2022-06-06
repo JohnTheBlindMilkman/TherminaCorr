@@ -24,6 +24,11 @@ OBJ_Q2  = $(SRC_Q2:$(DIR_CXX)%.cxx=$(DIR_OBJ)%.o)
 
 # preprocessor
 PREPROCESS  = -D_CXX_VER_="\"$(shell $(CXX) --version | grep $(CXX))\"" -D_ROOT_VER_="\"$(shell root-config --version)\""
+ifdef DEBUG
+  PREPROCESS  := $(PREPROCESS) -D_DEBUG_LEVEL_=$(DEBUG)
+else
+  PREPROCESS  := $(PREPROCESS) -D_DEBUG_LEVEL_=0
+endif
 
 # compilation
 CXX         = g++

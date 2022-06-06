@@ -1,2 +1,3 @@
 TO-DO: make plots for 1D correlation
 TO-DO: move function plotting to HBTFit.cxx
+TO-DO: expand Messages::Summary() to include more info + make it into .log file

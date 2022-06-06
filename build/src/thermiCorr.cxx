@@ -353,7 +353,7 @@ int main(int argc, char **argv)
                 else if(iter == 3)
                     losl = true;
             }
-            PRINT_DEBUG_1("\t" + sParNames[iter] << parVal << " +/- " << parErr);
+            PRINT_DEBUG_1("\t" + sParNames[iter] + "\t"<< parVal << " +/- " << parErr);
         }
         delete store;    
 
