@@ -295,7 +295,7 @@ int main(int argc, char **argv)
         ratq1->Divide(numq1, denq1, 1.0, 1.0);
         ratq1->SetName("ratq1");
         ratq1->SetTitle("ratq1");
-        ratq1->Fit(funqk1, "RB");
+        ratq1->Fit(funqk1, "RBMPE");
 
         numq = new TH3D(*((TH3D *) tInRootFile->Get(numname)));
         denq = new TH3D(*((TH3D *) tInRootFile->Get(denname)));
@@ -304,7 +304,7 @@ int main(int argc, char **argv)
         ratq->Divide(numq, denq, 1.0, 1.0);
         ratq->SetName("ratq");
         ratq->SetTitle("ratq");
-        ratq->Fit(funqk, "RB");
+        ratq->Fit(funqk, "RBMPE");
 
 // ##############################################################
 // # Save fit values						

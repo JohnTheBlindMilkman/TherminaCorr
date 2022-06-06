@@ -24,7 +24,7 @@ int main(int argc, char **argv)
     // ##############################################################
 
     int noGraphs,minkT,maxkT;
-    TString sFilePath,sMainINI,sEventDir,sExpFilePath,sParam,sModelName,sExpGraphName[len],sOvrrd,sTest;  
+    TString sFilePath,sMainINI,sEventDir,sExpFilePath,sParam,sModelName,sExpGraphName[len],sOvrrd,sTest,sCompResFile;  
     Configurator *sMainConfig;
     Accessibility *accss;
     Compliance *comp;
@@ -119,7 +119,19 @@ int main(int argc, char **argv)
     // # Fit
     // ##############################################################
 
-    store = new Storage(sEventDir + "Q2result.txt",sOvrrd);
+    sCompResFile = "";
+
+    if(sTest.CompareTo("Q2test"))
+        sCompResFile = "Q2result.txt";
+    else if(sTest.CompareTo("Chi2test"))
+        sCompResFile = "Chi2result.txt";
+    else
+    {
+        PRINT_MESSAGE("Unknown compliance test type. Aborting execution.");
+        exit(_ERROR_GENERAL_UNSUPORTED_VALUE_);
+    }
+
+    store = new Storage(sEventDir + sCompResFile,sOvrrd);
     
     for(int i = 0; i < len; i++)
     {

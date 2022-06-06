@@ -55,23 +55,33 @@ double Compliance::printResult(TString testType, bool moreInfo)
     {
         testRes = Q2Test(ndf,totDif);
 
-        PRINT_MESSAGE("================== Q2 Test Result ==================");
-        PRINT_MESSAGE(Form("Parameter:\t%s",mModName.Data()));
-        PRINT_MESSAGE(Form("Q2:\t%f",testRes));
-        if(moreInfo)
-            PRINT_MESSAGE(Form("Total difference on x axis per NDF:\t%.2f/%d",totDif,ndf));
-        PRINT_MESSAGE("====================================================");
+        if(testRes < 0)
+            PRINT_MESSAGE("<Compliance::printResult>\tNDF is zero.")
+        else
+        {
+            PRINT_MESSAGE("================== Q2 Test Result ==================");
+            PRINT_MESSAGE(Form("Parameter:\t%s",mModName.Data()));
+            PRINT_MESSAGE(Form("Q2:\t%f",testRes));
+            if(moreInfo)
+                PRINT_MESSAGE(Form("Total difference on x axis per NDF:\t%.2f/%d",totDif,ndf));
+            PRINT_MESSAGE("====================================================");
+        }
     }
     else if(testType == "Chi2test")
     {
         testRes = Chi2Test(ndf,totDif);
 
-        PRINT_MESSAGE("================= Chi2 Test Result =================");
-        PRINT_MESSAGE(Form("Parameter:\t%s",mModName.Data()));
-        PRINT_MESSAGE(Form("Chi2:\t%f",testRes));
-        if(moreInfo)
-            PRINT_MESSAGE(Form("Total difference on x axis per NDF:\t%.2f/%d",totDif,ndf));
-        PRINT_MESSAGE("====================================================");
+         if(testRes < 0)
+            PRINT_MESSAGE("<Compliance::printResult>\tNDF is zero.")
+        else
+        {
+            PRINT_MESSAGE("================= Chi2 Test Result =================");
+            PRINT_MESSAGE(Form("Parameter:\t%s",mModName.Data()));
+            PRINT_MESSAGE(Form("Chi2:\t%f",testRes));
+            if(moreInfo)
+                PRINT_MESSAGE(Form("Total difference on x axis per NDF:\t%.2f/%d",totDif,ndf));
+            PRINT_MESSAGE("====================================================");
+        }
     }
     else
     {
@@ -112,7 +122,10 @@ double Compliance::Q2Test(int &ndf,double &totDiff)
             Q2 += (yMod*yMod - 2*yMod*yExp + yExp*yExp)/(yExp*yExp);
     }
 
-    return TMath::Abs(Q2)/ndf;
+    if(ndf != 0)
+        return TMath::Abs(Q2)/ndf;
+    else
+        return -1;
 }
 
 double Compliance::Chi2Test(int &ndf, double &totDiff)
@@ -137,7 +150,10 @@ double Compliance::Chi2Test(int &ndf, double &totDiff)
     }
 
     ndf--;
-    return TMath::Abs(Chi2)/ndf;
+    if(ndf != 0)
+        return TMath::Abs(Chi2)/ndf;
+    else
+        return -1;
 }
 
 double Compliance::getClosest(double xVal,int &i, double &x, double &y)
