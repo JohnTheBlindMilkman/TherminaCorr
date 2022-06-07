@@ -121,9 +121,9 @@ int main(int argc, char **argv)
 
     sCompResFile = "";
 
-    if(sTest.CompareTo("Q2test"))
+    if(!sTest.CompareTo("Q2test"))
         sCompResFile = "Q2result.txt";
-    else if(sTest.CompareTo("Chi2test"))
+    else if(!sTest.CompareTo("Chi2test"))
         sCompResFile = "Chi2result.txt";
     else
     {
