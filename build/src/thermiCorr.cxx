@@ -22,7 +22,7 @@ int main(int argc, char **argv)
     HBTFit *hbtFit;
     Storage *store;
     TH3D *ratq;
-    TH1D *ratq1;
+    TH1D *ratq1,*hExpProj[3][3],*hFitProj[3][3];
     TF3 *funqg,*funqk;
     TF1 *funqg1,*funqk1;
     TDatime tDate;
@@ -273,8 +273,6 @@ int main(int argc, char **argv)
         funqk1->SetParName(iter, sParNames[iter]);
     }
     
-    
-
     for(int ii = minkT; ii <= maxkT; ii++)
     {
         lambda = 0;
@@ -364,166 +362,29 @@ int main(int argc, char **argv)
 // # Make plots							
 // ############################################################## 
 
-        TH3D *fitnq;
+        int padItr = 1;
 
-        TH1D *hpx1 = hbtFit->getproj(numq, denq, 0, 0, pars[0]);
-        TH1D *hpy1 = hbtFit->getproj(numq, denq, 1, 0, pars[0]);
-        TH1D *hpz1 = hbtFit->getproj(numq, denq, 2, 0, pars[0]);
-        
-        TH1D *hpx2 = hbtFit->getproj(numq, denq, 0, 4, pars[0]);
-        TH1D *hpy2 = hbtFit->getproj(numq, denq, 1, 4, pars[0]);
-        TH1D *hpz2 = hbtFit->getproj(numq, denq, 2, 4, pars[0]);
-        
-        TH1D *hpx3 = hbtFit->getproj(numq, denq, 0, 10, pars[0]);
-        TH1D *hpy3 = hbtFit->getproj(numq, denq, 1, 10, pars[0]);
-        TH1D *hpz3 = hbtFit->getproj(numq, denq, 2, 10, pars[0]);
-        
-        hbtFit->getfitprojc(denq, &fitnq, funqk);
-
-        TH1D *fpx1 = hbtFit->getproj(fitnq, denq, 0, 0, pars[0]);
-        TH1D *fpy1 = hbtFit->getproj(fitnq, denq, 1, 0, pars[0]);
-        TH1D *fpz1 = hbtFit->getproj(fitnq, denq, 2, 0, pars[0]);
-        
-        TH1D *fpx2 = hbtFit->getproj(fitnq, denq, 0, 4, pars[0]);
-        TH1D *fpy2 = hbtFit->getproj(fitnq, denq, 1, 4, pars[0]);
-        TH1D *fpz2 = hbtFit->getproj(fitnq, denq, 2, 4, pars[0]);
-        
-        TH1D *fpx3 = hbtFit->getproj(fitnq, denq, 0, 10, pars[0]);
-        TH1D *fpy3 = hbtFit->getproj(fitnq, denq, 1, 10, pars[0]);
-        TH1D *fpz3 = hbtFit->getproj(fitnq, denq, 2, 10, pars[0]);
-        
-        hpx1->SetName("CFproj_out_1");
-        hpy1->SetName("CFproj_side_1");
-        hpz1->SetName("CFproj_long_1");
-
-        hpx2->SetName("CFproj_out_2");
-        hpy2->SetName("CFproj_side_2");
-        hpz2->SetName("CFproj_long_2");
-
-        hpx3->SetName("CFproj_out_3");
-        hpy3->SetName("CFproj_side_3");
-        hpz3->SetName("CFproj_long_3");
-
-        fpx1->SetName("FITproj_out_1");
-        fpy1->SetName("FITproj_side_1");
-        fpz1->SetName("FITproj_long_1");
-
-        fpx2->SetName("FITproj_out_2");
-        fpy2->SetName("FITproj_side_2");
-        fpz2->SetName("FITproj_long_2");
-
-        fpx3->SetName("FITproj_out_3");
-        fpy3->SetName("FITproj_side_3");
-        fpz3->SetName("FITproj_long_3");
-
-        hbtFit->preparehist(hpx1,1);
-        hbtFit->preparehist(hpy1,1);
-        hbtFit->preparehist(hpz1,1);
-
-        hbtFit->preparehist(hpx2,1);
-        hbtFit->preparehist(hpy2,1);
-        hbtFit->preparehist(hpz2,1);
-
-        hbtFit->preparehist(hpx3,1);
-        hbtFit->preparehist(hpy3,1);
-        hbtFit->preparehist(hpz3,1);
-
-        hbtFit->preparehist(fpx1,3);
-        hbtFit->preparehist(fpy1,3);
-        hbtFit->preparehist(fpz1,3);
-
-        hbtFit->preparehist(fpx2,3);
-        hbtFit->preparehist(fpy2,3);
-        hbtFit->preparehist(fpz2,3);
-
-        hbtFit->preparehist(fpx3,3);
-        hbtFit->preparehist(fpy3,3);
-        hbtFit->preparehist(fpz3,3);
+        TH3D *fitnq = hbtFit->getfitprojc(denq, funqk);
 
         TCanvas *cancf = new TCanvas ("cancf", "cancf", 1200, 1200);
         gPad->SetFillColor(0);
         gPad->SetFillStyle(4000);
         cancf->Divide(3,3,0.0001,0.0001);
-        
-        hpx1->GetXaxis()->SetTitle("q_{out} [GeV/c]");
-        hpy1->GetXaxis()->SetTitle("q_{side} [GeV/c]");
-        hpz1->GetXaxis()->SetTitle("q_{long} [GeV/c]");
 
-        hpx1->GetYaxis()->SetTitle("C(q_{out})");
-        hpy1->GetYaxis()->SetTitle("C(q_{side})");
-        hpz1->GetYaxis()->SetTitle("C(q_{long})");
+        for(int jj = 0; jj < 3; jj++)
+            for(int kk = 0; kk < 3; kk++)
+            {
+                hExpProj[jj][kk] = hbtFit->getproj(numq, denq, jj, projWidth[kk], pars[0]);
+                hFitProj[jj][kk] = hbtFit->getproj(fitnq, denq, jj, projWidth[kk], pars[0]);
 
-        hpx2->GetXaxis()->SetTitle("q_{out} [GeV/c]");
-        hpy2->GetXaxis()->SetTitle("q_{side} [GeV/c]");
-        hpz2->GetXaxis()->SetTitle("q_{long} [GeV/c]");
+                hbtFit->preparehist(hExpProj[jj][kk],jj,kk+1,"CF");
+                hbtFit->preparehist(hFitProj[jj][kk],jj,kk+1,"FIT");
 
-        hpx2->GetYaxis()->SetTitle("C(q_{out})");
-        hpy2->GetYaxis()->SetTitle("C(q_{side})");
-        hpz2->GetYaxis()->SetTitle("C(q_{long})");
+                cancf->cd(padItr);
+                hbtFit->preparepad(hExpProj[jj][kk],hFitProj[jj][kk]);
 
-        hpx3->GetXaxis()->SetTitle("q_{out} [GeV/c]");
-        hpy3->GetXaxis()->SetTitle("q_{side} [GeV/c]");
-        hpz3->GetXaxis()->SetTitle("q_{long} [GeV/c]");
-
-        hpx3->GetYaxis()->SetTitle("C(q_{out})");
-        hpy3->GetYaxis()->SetTitle("C(q_{side})");
-        hpz3->GetYaxis()->SetTitle("C(q_{long})");
-
-        cancf->cd(1);
-        hbtFit->preparepad();
-
-        hpx1->Draw("HISTPE1");
-        fpx1->Draw("SAMEHISTL");
-
-        cancf->cd(2);
-        hbtFit->preparepad();
-
-        hpy1->Draw("HISTPE1");
-        fpy1->Draw("SAMEHISTL");
-
-        cancf->cd(3);
-        hbtFit->preparepad();
-
-        hpz1->Draw("HISTPE1");
-        fpz1->Draw("SAMEHISTL");
-
-        cancf->cd(4);
-        hbtFit->preparepad();
-
-        hpx2->Draw("HISTPE1");
-        fpx2->Draw("SAMEHISTL");
-
-        cancf->cd(5);
-        hbtFit->preparepad();
-
-        hpy2->Draw("HISTPE1");
-        fpy2->Draw("SAMEHISTL");
-
-        cancf->cd(6);
-        hbtFit->preparepad();
-
-        hpz2->Draw("HISTPE1");
-        fpz2->Draw("SAMEHISTL");
-
-        cancf->cd(7);
-        hbtFit->preparepad();
-
-        hpx3->Draw("HISTPE1");
-        fpx3->Draw("SAMEHISTL");
-
-        cancf->cd(8);
-        hbtFit->preparepad();
-
-        hpy3->Draw("HISTPE1");
-        fpy3->Draw("SAMEHISTL");
-
-        cancf->cd(9);
-        hbtFit->preparepad();
-
-        hpz3->Draw("HISTPE1");
-        fpz3->Draw("SAMEHISTL");
-
-        //TO-DO: make plots for 1D correlation
+                padItr++;
+            }
 
 // ##############################################################
 // # Save plots							
@@ -535,30 +396,13 @@ int main(int argc, char **argv)
         tOutRootName.ReplaceAll("femto","hbtfit");
         tOutRootFile = TFile::Open(tOutRootName,"RECREATE");
         tOutRootFile->cd();
-        
-        hpx1->Write();
-        hpy1->Write();
-        hpz1->Write();
 
-        hpx2->Write();
-        hpy2->Write();
-        hpz2->Write();
-
-        hpx3->Write();
-        hpy3->Write();
-        hpz3->Write();
-
-        fpx1->Write();
-        fpy1->Write();
-        fpz1->Write();
-
-        fpx2->Write();
-        fpy2->Write();
-        fpz2->Write();
-
-        fpx3->Write();
-        fpy3->Write();
-        fpz3->Write();
+        for(int jj = 0; jj < 3; jj++)
+            for(int kk = 0; kk < 3; kk++)
+            {
+                hExpProj[jj][kk]->Write();
+                hFitProj[jj][kk]->Write();
+            }
 
         tOutRootFile->Close();
         tInRootFile->Close();

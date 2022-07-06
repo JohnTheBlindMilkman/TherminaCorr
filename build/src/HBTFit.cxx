@@ -11,18 +11,19 @@ HBTFit::~HBTFit()
 {
 }
 
-void HBTFit::getfitprojc(TH3D *expden, TH3D **projhist, TF3 *funqk)
+TH3D* HBTFit::getfitprojc(TH3D *expden, TF3 *funqk)
 {
-    (*projhist) = new TH3D(*expden);
+    TH3D *projhist = new TH3D(*expden);
 
     for (int q1int = 1; q1int <= expden->GetNbinsX(); q1int++)
         for (int q2int = 1; q2int <= expden->GetNbinsY(); q2int++) 
             for (int q3int = 1; q3int <= expden->GetNbinsZ(); q3int++) 
-                (*projhist)->SetBinContent(q1int, q2int, q3int,expden->GetBinContent(q1int, q2int, q3int) * funqk->Eval(expden->GetXaxis()->GetBinCenter(q1int),expden->GetYaxis()->GetBinCenter(q2int),expden->GetZaxis()->GetBinCenter(q3int)));
+                projhist->SetBinContent(q1int, q2int, q3int,expden->GetBinContent(q1int, q2int, q3int) * funqk->Eval(expden->GetXaxis()->GetBinCenter(q1int),expden->GetYaxis()->GetBinCenter(q2int),expden->GetZaxis()->GetBinCenter(q3int)));
 
+    return projhist;
 }
 
-void HBTFit::preparepad()
+void HBTFit::preparepad(TH1D *hExp, TH1D* hFit)
 {
     gPad->SetFillStyle(4000);
     gPad->SetFillColor(0);
@@ -30,25 +31,31 @@ void HBTFit::preparepad()
     gPad->SetTopMargin(0.03);
     gPad->SetBottomMargin(0.12);
     gPad->SetGridy();
+
+    hExp->Draw("HISTPE1");
+    hFit->Draw("SAMEHISTL");
 }
 
-void HBTFit::preparehist(TH1D *hist, int type)
+void HBTFit::preparehist(TH1D *hist, int projType, int wType, TString type)
 {
-    if ((type==2) || (type == 3)) 
+    if(projType < 0 || projType > 2 || wType < 1 || wType > 3)
     {
-        if (type == 2)
-            hist->SetLineColor(4);
-        else
-            hist->SetLineColor(8);
+        PRINT_MESSAGE("<HBTFit::preparehist>: Unknown projection type or width");
+        exit(_ERROR_GENERAL_UNSUPORTED_VALUE_);
+    }
+
+    if (!type.CompareTo("FIT")) 
+    {
+        hist->SetLineColor(8);
         hist->SetLineWidth(2);
         hist->SetLineStyle(2);
     }
-    else 
+    else if(!type.CompareTo("CF"))
     {
         hist->SetMarkerSize(1.0);
-        hist->SetMarkerColor(type+1);
-        hist->SetMarkerStyle(type==0?8:24);
-        hist->SetTitle("");
+        hist->SetMarkerColor(2);
+        hist->SetMarkerStyle(kOpenCircle);
+        hist->SetTitle(Form(";q_{%s} [GeV/c];C(q_{%s})",sProjNames[projType].Data(),sProjNames[projType].Data()));
         hist->SetMinimum(hist->GetMinimum()*0.9);
         hist->SetMaximum(hist->GetMaximum()*1.1);
         hist->GetXaxis()->SetLabelSize(0.055);
@@ -57,6 +64,13 @@ void HBTFit::preparehist(TH1D *hist, int type)
         hist->GetYaxis()->SetTitleSize(0.055);
         hist->GetYaxis()->SetTitleOffset(0.8);
     }
+    else
+    {
+        PRINT_MESSAGE("<HBTFit::preparehist>: Unknown histogram type");
+        exit(_ERROR_GENERAL_UNSUPORTED_VALUE_);
+    }
+
+    hist->SetName(Form("%sproj_%s_%d",type.Data(),sProjNames[projType].Data(),wType));
 }
 
 TH1D* HBTFit::getproj(TH3D *numq, TH3D *denq, int nproj, int wbin, double norm)
@@ -94,7 +108,7 @@ TH1D* HBTFit::getproj(TH3D *numq, TH3D *denq, int nproj, int wbin, double norm)
             numq->GetZaxis()->SetRange(1,numq->GetNbinsZ());
             break;
         default:
-            PRINT_MESSAGE("Error: Unknown projection type");
+            PRINT_MESSAGE("<HBTFit::getproj>: Unknown projection type");
             exit(_ERROR_GENERAL_UNSUPORTED_VALUE_);
     }
     

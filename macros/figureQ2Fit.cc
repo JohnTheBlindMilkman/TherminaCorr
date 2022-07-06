@@ -17,7 +17,7 @@ void figureQ2Fit()
     gStyle->SetOptStat(0);
     
     const int noE = 7;
-    const TString folderPath = "/home/jedkol/Downloads/modelSR/MotoMotoNoLimit";
+    const TString folderPath = "/home/jedkol/Downloads/modelSR/MotoMotoTemp";
     const TString epsType[] = {"E6","E5","E4","E3","E2","E1","E0"};
     const TString modelName[] = {"gRinv_5_12","gRout_5_12","gRside_5_12","gRlong_5_12"};
     const TString rName[] = {"R_{inv}","R_{out}","R_{side}","R_{long}"};
@@ -33,7 +33,7 @@ void figureQ2Fit()
 
     for(int i = 0; i < noE; i++)
     {
-        ifFile.open(Form("%s/H170%sD5femto/Q2result.txt",folderPath.Data(),epsType[i].Data()));
+        ifFile.open(Form("%s/H165%sD4femto/Q2result.txt",folderPath.Data(),epsType[i].Data()));
         ifFile >> sName >> sName;
         for(int j = 0; j < 4; j++)
             ifFile >> sName >> yVal[j][i];
@@ -53,13 +53,14 @@ void figureQ2Fit()
     {
         canv1->cd(i+1);
         gRes[i] = new TGraph(noE,epsVal,&yVal[i][0]);
-        gRes[i]->SetMarkerStyle(20);
-        gRes[i]->SetMarkerColor(kRed);
-        gRes[i]->SetLineColor(kBlack);
+        //gRes[i]->SetMarkerStyle(20);
+        //gRes[i]->SetMarkerColor(kRed);
+        gRes[i]->SetLineColor(kRed);
+        gRes[i]->SetLineWidth(5);
         gRes[i]->SetTitle(rName[i].Data());
         gRes[i]->GetXaxis()->SetRangeUser(-0.7,0.1);
         
-        gRes[i]->Draw("apl");
+        gRes[i]->Draw("ac");
 
         for(int j = 0; j < noE; j++)
             hRes->SetBinContent(j+1,i+1,yVal[i][j]);

@@ -14,12 +14,14 @@
 
     static const int kFileNameMaxChar = 2000;
     static const int NoParams = 7;
+    static const int projWidth[] = {0,4,10};
 
     static const TString sParNames[NoParams] = {"LambdaInv","Rinv","Norm","LambdaOSL","Rout","Rside","Rlong"};
+    static const TString sProjNames[] = {"out","side","long"};
 
     // Define version of THERMINATOR 2
 
-    #define _THERMINACORR_VERSION_  "1.5.2"
+    #define _THERMINACORR_VERSION_  "1.6.0"
 
     // Define compilation specific variables
 

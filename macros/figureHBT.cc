@@ -21,7 +21,9 @@ const EColor color[] = {kGreen,kRed,kOrange};
 void preparegraph(TGraphErrors *aGE)
 {
     aGE->SetTitle("");
+    //aGE->SetLineWidth(4);
     aGE->SetMarkerStyle(20);
+    //aGE->SetMarkerSize(2);
     aGE->GetXaxis()->SetLimits(30.,449.999);
 }
 
@@ -189,10 +191,10 @@ void figureHBT()
         for(int j = 0; j < NoMod; j++)
         {
             preparegraph(gModel[j][i]);
-            gModel[j][i]->Draw("same lp plc pmc");
+            gModel[j][i]->Draw("same p l plc pmc");
 
             if(i == 0)
-                legMod->AddEntry(gModel[j][i],Form("#epsilon = %.1f",epsVal[j]),"lp");
+                legMod->AddEntry(gModel[j][i],Form("#epsilon = %.1f",epsVal[j]),"l");
         }
     }
 
@@ -203,4 +205,6 @@ void figureHBT()
     legMod->Draw("same");
 
     c1->Draw();
+    c1->SaveAs(folderPath + "/graphOutput/HBT.png");
+    c1->SaveAs(folderPath + "/graphOutput/HBT.eps");
 }
