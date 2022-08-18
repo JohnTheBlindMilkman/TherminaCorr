@@ -1,3 +1,9 @@
+// ==========================================================================
+// TherminaCorr - an extension of THERMINATOR 2 therm2_hbtfit functionality
+// Author: Jedrzej Kolas
+// Code at: https://github.com/JohnTheBlindMilkman/TherminaCorr
+// ==========================================================================
+
 #ifndef _TH2_STORAGE_H_
     #define _TH2_STORAGE_H_
 

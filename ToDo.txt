@@ -1,2 +1,4 @@
 TO-DO: make plots for 1D correlation
 TO-DO: expand Messages::Summary() to include more info + make it into .log file
+TO-DO: make sure that plots in partameterFit.root are saved with actual kt range and not initial? (eg. do ./thermiCoor with range 3 14, but kT is found for 5 12, so which should be the graph name?)
+TO-DO: log likelyhood method for fitting the corr function and maybe the Q2tests and such?

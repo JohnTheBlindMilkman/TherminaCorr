@@ -1,3 +1,9 @@
+// ==========================================================================
+// TherminaCorr - an extension of THERMINATOR 2 therm2_hbtfit functionality
+// Author: Jedrzej Kolas
+// Code at: https://github.com/JohnTheBlindMilkman/TherminaCorr
+// ==========================================================================
+
 #include <iostream>
 #include <TFile.h>
 #include <TCanvas.h>
@@ -8,6 +14,7 @@
 #include <TStyle.h>
 #include <TDirectory.h>
 #include <TSystem.h>
+#include <TLegend.h>
 
 using namespace std;
 
@@ -26,6 +33,7 @@ void figureCorr()
     TCanvas *c[len];
     TFile *inFile;
     TH1D *hCF[3], *hFIT[3], *hFITcopy[3];
+    TLegend *leg = new TLegend(0.75,0.75,0.95,0.95,"","NDC");
     int iter = 0;
 
     if(! dir->GetDirectory(filePath + "outGraphs/"))
@@ -50,7 +58,7 @@ void figureCorr()
             hCF[j]->SetFillColor(cGreen);
             hCF[j]->SetFillStyle(3390);
             hCF[j]->SetMarkerColor(cGreen);
-            hCF[j]->SetMarkerStyle(8);
+            hCF[j]->SetMarkerStyle(8);                
 
             hFIT[j] = (TH1D*) inFile->Get(Form("FITproj_%s_3",projName[j].Data()));
             hFIT[j]->SetLineColor(cRed);
@@ -63,8 +71,16 @@ void figureCorr()
             hCF[j]->Draw("p e4");
             hFIT[j]->Draw("e4 same");
             hFITcopy[j]->Draw("c hist same");
+            if(j == 0)
+            {
+                if(iter == 0)
+                {
+                    leg->AddEntry(hCF[j],"Data","pf");
+                    leg->AddEntry(hFIT[j],"Fit","lf");
+                }
+                leg->Draw("same");
+            }
         }
-
         c[iter]->SaveAs(Form("%soutGraphs/canvaspipi%da.eps",filePath.Data(),i));
 
         iter++;

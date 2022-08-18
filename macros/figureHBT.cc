@@ -1,3 +1,9 @@
+// ==========================================================================
+// TherminaCorr - an extension of THERMINATOR 2 therm2_hbtfit functionality
+// Author: Jedrzej Kolas
+// Code at: https://github.com/JohnTheBlindMilkman/TherminaCorr
+// ==========================================================================
+
 #include <iostream>
 #include <TFile.h>
 #include <TCanvas.h>
@@ -21,7 +27,7 @@ const EColor color[] = {kGreen,kRed,kOrange};
 void preparegraph(TGraphErrors *aGE)
 {
     aGE->SetTitle("");
-    //aGE->SetLineWidth(4);
+    aGE->SetLineWidth(2);
     aGE->SetMarkerStyle(20);
     //aGE->SetMarkerSize(2);
     aGE->GetXaxis()->SetLimits(30.,449.999);
@@ -60,7 +66,7 @@ void preparegraph(TGraphAsymmErrors *aGE, int col, bool isLambda = false)
 
 void figureHBT()
 {  
-    gStyle->SetPalette(kDeepSea);
+    gStyle->SetPalette(kLake);
 
     const TString folderPath = "/home/jedkol/Downloads/modelSR/HighTemp";
     const TString tName[] = {"#pi^{+} - #pi^{+}","#pi^{-} - #pi^{-}","#pi^{0} - #pi^{0}"};
@@ -71,7 +77,7 @@ void figureHBT()
     const TString expName[] = {"geExpInv","geExpO","geExpS","geExpL","geExpLamInv","geLamosl"};
     const TString rName[] = {"R_{inv}","R_{out}","R_{side}","R_{long}","#lambda_{inv}","#lambda_{osl}"};
     const double epsVal[] = {0.0,-0.1,-0.2,-0.3,-0.4,-0.5,-0.6};
-    const int NoExp = 3, NoMod = 4;
+    const int NoExp = 3, NoMod = 7;
 
     TGraphErrors *gModel[NoMod][nPads];
     TGraphAsymmErrors *gaeExp[NoExp][nPads];
@@ -115,7 +121,11 @@ void figureHBT()
     c1->Divide(2,3,0,0);
 
     legExp = new TLegend(0.75,0.65,1.,1.);
+    legExp->SetBorderSize(0);
+    legExp->SetFillStyle(0);
     legMod = new TLegend(0.6,0.5,0.8,1.);
+    legMod->SetBorderSize(0);
+    legMod->SetFillStyle(0);
 
     for(int i = 0; i < nPads; i++)
     {
@@ -191,7 +201,7 @@ void figureHBT()
         for(int j = 0; j < NoMod; j++)
         {
             preparegraph(gModel[j][i]);
-            gModel[j][i]->Draw("same p l plc pmc");
+            gModel[j][i]->Draw("same c x plc");
 
             if(i == 0)
                 legMod->AddEntry(gModel[j][i],Form("#epsilon = %.1f",epsVal[j]),"l");
