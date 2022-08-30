@@ -68,7 +68,7 @@ void figureHBT()
 {  
     gStyle->SetPalette(kLake);
 
-    const TString folderPath = "/home/jedkol/Downloads/modelSR/HighTemp";
+    const TString folderPath = "/home/jedkol/Downloads/modelSR/MotoMotoNoLimit";
     const TString tName[] = {"#pi^{+} - #pi^{+}","#pi^{-} - #pi^{-}","#pi^{0} - #pi^{0}"};
     const TString pName[] = {"pipi","piMpiM","pi0pi0"};
     const TString fName[] = {"pipi","pimpim","pi0pi0"};
@@ -104,7 +104,7 @@ void figureHBT()
 
     for(int i = 0; i < NoMod; i++)  //input model data
     {
-        fModelData = TFile::Open(Form("%s/H225%sD4femto/parameterFit%s.root",folderPath.Data(),epsType[i].Data(),pName[0].Data()),"read");
+        fModelData = TFile::Open(Form("%s/H170%sD5femto/parameterFit%s.root",folderPath.Data(),epsType[i].Data(),pName[0].Data()),"read");
         if(fModelData->IsOpen())
         {
             cout << "File " << Form("parameterFit%s.root",pName[0].Data()) << " is open" << endl;

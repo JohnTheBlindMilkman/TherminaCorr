@@ -51,7 +51,7 @@
 
     // Define version of THERMINATOR 2
 
-    #define _THERMINACORR_VERSION_  "1.6.0"
+    #define _THERMINACORR_VERSION_  "1.7.0"
 
     // Define compilation specific variables
 

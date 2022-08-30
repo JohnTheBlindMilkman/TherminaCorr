@@ -39,7 +39,7 @@ void figureQ2Fit()
 
     for(int i = 0; i < noE; i++)
     {
-        ifFile.open(Form("%s/HighTemp/H225%sD4femto/Chi2result.txt",folderPath.Data(),epsType[i].Data()));
+        ifFile.open(Form("%s/MotoMotoNoLimit/H170%sD5femto/Chi2result.txt",folderPath.Data(),epsType[i].Data()));
         ifFile >> sName >> sName;
         for(int j = 0; j < 4; j++)
             ifFile >> sName >> yVal[j][i];
@@ -59,7 +59,7 @@ void figureQ2Fit()
         gRes[i]->SetLineColor(kRed);
         gRes[i]->SetLineWidth(5);
         gRes[i]->SetTitle(";#epsilon;#chi^{2}/ndf");
-        gRes[i]->GetYaxis()->SetRangeUser(0,1700);
+        gRes[i]->GetYaxis()->SetRangeUser(0,300);
         gRes[i]->GetXaxis()->SetRangeUser(-0.7,0.1);
         
         if(i == 0)
@@ -72,5 +72,5 @@ void figureQ2Fit()
 
     tLeg->Draw("same");
 
-    canv1->SaveAs(folderPath + "/outThesisGraphs/fitCaseB.eps");
+    canv1->SaveAs(folderPath + "/outThesisGraphs/fitCaseD.eps");
 }
